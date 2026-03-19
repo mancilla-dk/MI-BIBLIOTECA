@@ -1121,12 +1121,12 @@
         if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
         toggleAdminForms(isAdminMode);
     }
-       /* --- 4. ADMIN MODE (CONTROL TOTAL) --- */
+           /* --- 4. ADMIN MODE (CONTROL TOTAL) --- */
     window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
             toggleAdminForms(false);
-            alert("Modo Admin: DESACTIVADO");
+            showModal("Atención", "Modo Admin: DESACTIVADO");
             refreshActiveViews();
             updateUserUI(); 
             initSocialFeed(); 
@@ -1138,18 +1138,22 @@
     window.loginAdmin = async function() {
         const em = document.getElementById('admin-email').value.trim();
         const pw = document.getElementById('admin-pass').value;
-        if(em !== 'mancillacanales992@gmail.com') {
-            return alert("⛔ Acceso denegado. Solo el administrador principal.");
+        
+        // Aceptará tu correo original O el correo inventado admin@biblioteca.com
+        if(em !== 'admin@biblioteca.com' && em !== 'mancillacanales992@gmail.com') {
+            return showModal("Error", "⛔ Acceso denegado. Correo no autorizado.");
         }
+        
         try {
             await signInWithEmailAndPassword(auth, em, pw);
             document.getElementById('admin-login-modal').style.display = 'none';
             isAdminMode = true;
             toggleAdminForms(true);
-            alert("✅ Modo Admin: ACTIVADO\nTienes CONTROL TOTAL.");
+            showModal("Éxito", "✅ Modo Admin: ACTIVADO\nTienes CONTROL TOTAL.");
             refreshActiveViews();
             updateUserUI();   
             initSocialFeed(); 
+            
             if(updateConfig) {
                 document.getElementById('updStatus').value = updateConfig.status || 'off';
                 const vInp = document.getElementById('updVersionInput');
@@ -1160,9 +1164,10 @@
             }
             document.getElementById('admin-pass').value = '';
         } catch(e) {
-            alert("⛔ Contraseña o correo incorrectos.");
+            showModal("Error", "⛔ Contraseña o correo incorrectos.");
         }
     };
+
 
             function toggleAdminForms(show) {
         const display = show ? 'block' : 'none';
@@ -2426,4 +2431,5 @@
 
 </body>
 </html>
+
 
