@@ -1,0 +1,2429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MI BIBLIOTECA - App Ultimate</title>
+        <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e1e24">
+
+        <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+    <style>
+
+        html, body { overscroll-behavior-y: contain; }
+
+        /* --- 1. SISTEMA DE TEMAS (BASE) --- */
+        :root {
+            --bg-wall: #1e1e24; 
+            --brick-1: #25252d; --brick-2: #2b2b36;
+            --ui-bg: rgba(255, 255, 255, 0.08);
+            --ui-border: rgba(255, 255, 255, 0.15);
+            --header-bg: rgba(30, 30, 36, 0.98);
+            --text-main: #f0f0f0; --text-muted: #b0b0b0;
+            --accent: #00e5ff; --accent-glow: rgba(0, 229, 255, 0.25);
+            /* Colores Feed */
+            --like-color: #00e676;
+            --disagree-color: #ff1744;
+        }
+        /* Temas (Intactos) */
+        body.theme-orange { --bg-wall: #1a1008; --brick-1: #26170b; --brick-2: #331f0e; --ui-bg: rgba(255, 140, 0, 0.08); --ui-border: rgba(255, 140, 0, 0.3); --header-bg: rgba(26, 16, 8, 0.98); --text-main: #fff0e0; --text-muted: #d0b0a0; --accent: #ff6d00; --accent-glow: rgba(255, 109, 0, 0.4); }
+        body.theme-silver { --bg-wall: #212121; --brick-1: #2c2c2c; --brick-2: #383838; --ui-bg: rgba(200, 200, 200, 0.08); --ui-border: rgba(200, 200, 200, 0.2); --header-bg: rgba(33, 33, 33, 0.98); --text-main: #ffffff; --text-muted: #9e9e9e; --accent: #b0bec5; --accent-glow: rgba(176, 190, 197, 0.3); }
+        body.theme-red { --bg-wall: #1a0505; --brick-1: #290a0a; --brick-2: #380e0e; --ui-bg: rgba(255, 50, 50, 0.08); --ui-border: rgba(255, 82, 82, 0.3); --header-bg: rgba(26, 5, 5, 0.98); --text-main: #ffebee; --text-muted: #e57373; --accent: #ff1744; --accent-glow: rgba(255, 23, 68, 0.4); }
+        body.theme-blue { --bg-wall: #050a1a; --brick-1: #0a1433; --brick-2: #0f1e4d; --ui-bg: rgba(68, 138, 255, 0.08); --ui-border: rgba(68, 138, 255, 0.3); --header-bg: rgba(5, 10, 26, 0.98); --text-main: #e3f2fd; --text-muted: #90caf9; --accent: #2979ff; --accent-glow: rgba(41, 121, 255, 0.4); }
+        body.theme-green { --bg-wall: #051a0a; --brick-1: #0a2910; --brick-2: #103816; --ui-bg: rgba(0, 230, 118, 0.08); --ui-border: rgba(0, 230, 118, 0.3); --header-bg: rgba(5, 26, 10, 0.98); --text-main: #e8f5e9; --text-muted: #a5d6a7; --accent: #00e676; --accent-glow: rgba(0, 230, 118, 0.4); }
+        body.theme-purple { --bg-wall: #12051a; --brick-1: #1f0a2e; --brick-2: #2d0e42; --ui-bg: rgba(213, 0, 249, 0.08); --ui-border: rgba(213, 0, 249, 0.3); --header-bg: rgba(18, 5, 26, 0.98); --text-main: #f3e5f5; --text-muted: #ce93d8; --accent: #d500f9; --accent-glow: rgba(213, 0, 249, 0.4); }
+        body.theme-gold { --bg-wall: #141005; --brick-1: #241d0a; --brick-2: #33290e; --ui-bg: rgba(255, 215, 0, 0.08); --ui-border: rgba(255, 215, 0, 0.3); --header-bg: rgba(20, 16, 5, 0.98); --text-main: #fffde7; --text-muted: #fff59d; --accent: #ffca28; --accent-glow: rgba(255, 202, 40, 0.4); }
+
+        body {
+            margin: 0; font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-wall);
+            background-image: 
+                linear-gradient(335deg, var(--brick-1) 23px, transparent 23px),
+                linear-gradient(155deg, var(--brick-2) 23px, transparent 23px),
+                linear-gradient(335deg, var(--brick-1) 23px, transparent 23px),
+                linear-gradient(155deg, var(--brick-2) 23px, transparent 23px);
+            background-size: 58px 58px;
+            background-position: 0px 2px, 4px 35px, 29px 31px, 34px 6px;
+            color: var(--text-main);
+            padding-bottom: 90px;
+            min-height: 100vh; overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* --- NUEVO: Indicador Offline --- */
+        #offline-indicator {
+            position: fixed; top: 0; left: 0; width: 100%; height: 25px;
+            background: #ff1744; color: white; display: none; /* Oculto por defecto */
+            align-items: center; justify-content: center; font-size: 11px; font-weight: bold;
+            z-index: 9999; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- NUEVO: Spinner de Carga --- */
+        .loading-container {
+            grid-column: 1 / -1; text-align: center; padding: 40px 0; color: var(--text-muted);
+        }
+        .spinner {
+            width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 10px;
+        }
+        @keyframes spin { to {transform: rotate(360deg);} }
+
+        /* --- FAB (Botón Flotante) --- */
+        .fab-btn {
+            position: fixed; bottom: 75px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--accent); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            z-index: 600; font-size: 24px; border: none; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.9); }
+        .fab-btn svg { width: 28px; height: 28px; fill: currentColor; }
+
+        /* --- Términos y Condiciones --- */
+        .terms-container {
+            display: flex; align-items: flex-start; gap: 10px; margin: 15px 0;
+            text-align: left; font-size: 11px; color: var(--text-muted);
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;
+        }
+        .terms-link { color: var(--accent); text-decoration: underline; cursor: pointer; margin-left: 3px; }
+
+        /* --- Contador de Usuarios (Robot) --- */
+        .online-counter {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px;
+            font-size: 11px; color: var(--accent); border: 1px solid var(--ui-border);
+            margin-bottom: 15px;
+        }
+        .online-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; box-shadow: 0 0 5px #00e676; }
+        
+        /* --- 2. MODAL DE NOTAS (REDISEÑO GLASS/MODERNO) --- */
+        #notes-modal .modal-content {
+            background: rgba(20, 20, 25, 0.95);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 25px rgba(0,0,0,0.8), 0 0 10px var(--accent-glow);
+            max-width: 90%; width: 350px;
+            border-radius: 20px;
+        }
+        
+        .notes-textarea {
+            width: 100%; box-sizing: border-box;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 15px;
+            color: #eee; font-family: 'Courier New', monospace;
+            font-size: 14px; line-height: 1.5; resize: none; outline: none;
+            margin-top: 10px; transition: 0.3s;
+        }
+        .notes-textarea:focus {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* --- 3. MODAL DE PERFIL (ONBOARDING) --- */
+        #profile-setup-modal { z-index: 10000; }
+        
+        .avatar-grid {
+            display: flex; justify-content: center; gap: 10px; margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .avatar-option {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); font-size: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid transparent; transition: 0.3s;
+        }
+        .avatar-option:hover { background: rgba(255,255,255,0.2); }
+        .avatar-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* --- 4. ESTILOS MURO SOCIAL --- */
+        .social-feed { display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
+        
+        .create-post-card {
+            background: var(--ui-bg); border: 1px solid var(--ui-border); 
+            border-radius: 12px; padding: 15px; margin-bottom: 20px;
+        }
+        
+        .social-card { 
+            background: rgba(30, 30, 36, 0.6); border: 1px solid var(--ui-border); 
+            border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.3s; position: relative;
+        }
+
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .post-avatar { 
+            width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.1); 
+            color: #fff; font-weight: bold; display: flex; align-items: center; 
+            justify-content: center; font-size: 18px; border: 1px solid var(--ui-border);
+        }
+        .post-meta { flex: 1; }
+        .post-author { font-size: 14px; font-weight: bold; color: var(--text-main); display: block; }
+        .post-date { font-size: 11px; color: var(--text-muted); }
+        
+        /* Etiquetas y Botones Admin */
+        .admin-badge {
+            color: #ffd700; background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;
+            padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 5px;
+            vertical-align: middle; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .post-del-btn { 
+            color: var(--disagree-color); background: rgba(255, 23, 68, 0.1); 
+            border: 1px solid var(--disagree-color); border-radius: 5px;
+            font-size: 14px; cursor: pointer; padding: 5px 10px; 
+            position: absolute; top: 15px; right: 15px;
+        }
+        .ban-btn {
+            color: #ffcc00; background: rgba(255, 204, 0, 0.1);
+            border: 1px solid #ffcc00; border-radius: 5px;
+            font-size: 10px; cursor: pointer; padding: 3px 6px;
+            margin-left: 5px;
+        }
+
+        .post-title { font-size: 17px; color: var(--accent); margin: 8px 0; font-weight: bold; }
+        .post-body { font-size: 14px; line-height: 1.5; color: #ddd; margin-bottom: 15px; white-space: pre-wrap; word-wrap: break-word;}
+
+        .social-actions { 
+            display: flex; gap: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; 
+        }
+        .action-btn { 
+            flex: 1; background: rgba(255,255,255,0.05); border: none; color: var(--text-muted); 
+            padding: 8px; border-radius: 20px; font-size: 12px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; 
+        }
+        .action-btn:hover { background: rgba(255,255,255,0.15); }
+        .action-btn.liked { color: var(--like-color); background: rgba(0, 230, 118, 0.1); font-weight: bold; }
+        .action-btn.disagreed { color: var(--disagree-color); background: rgba(255, 23, 68, 0.1); font-weight: bold; }
+
+        .comments-section { 
+            display: none; margin-top: 15px; padding-top: 10px; 
+            border-top: 1px dashed rgba(255,255,255,0.1); animation: fadeIn 0.3s;
+        }
+        .comment-item { 
+            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; 
+            margin-bottom: 8px; font-size: 13px; border-left: 2px solid var(--ui-border);
+        }
+        .comment-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .comment-author { color: var(--accent); font-weight: bold; font-size: 12px; }
+        .comment-text { color: var(--text-main); line-height: 1.3; }
+
+        /* --- UI COMPONENTES GENERALES --- */
+        .glass-panel {
+            background: var(--ui-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--ui-border); border-radius: 16px; padding: 25px; margin: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5); transition: 0.3s;
+        }
+        .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+        .theme-card {
+            background: rgba(0,0,0,0.2); border: 1px solid transparent; border-radius: 12px; padding: 15px;
+            text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .theme-card.active { border-color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 15px var(--accent-glow); }
+        .theme-preview-circle { width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 10px; border: 2px solid rgba(255,255,255,0.2); }
+        .theme-name { font-size: 11px; font-weight: bold; color: var(--text-muted); }
+
+        .shelf-wood {
+            grid-column: 1 / -1; height: 8px;
+            background: linear-gradient(to bottom, #eeeeee 0%, #cccccc 50%, #999999 100%);
+            margin-top: -12px; margin-bottom: 45px; 
+            border-radius: 2px 2px 5px 5px; transform: scaleX(1.02); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 -1px 0 rgba(255,255,255,0.6) inset; 
+            z-index: 20; position: relative; 
+            border-top: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .input-box {
+            width: 100%; padding: 15px; margin: 10px 0 20px 0; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--ui-border); border-radius: 8px; color: var(--text-main); box-sizing: border-box;
+        }
+        .btn-neon {
+            background: transparent; color: var(--accent); border: 2px solid var(--accent);
+            padding: 12px; width: 100%; border-radius: 30px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 5px var(--accent-glow); transition: 0.3s;
+        }
+        .btn-neon:hover { background: var(--accent); color: var(--bg-wall); box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-neon:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        
+        .btn-google {
+            background: white; color: #333; border: none; padding: 12px; width: 100%; 
+            border-radius: 30px; font-weight: bold; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .app-header {
+            background: var(--header-bg); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--ui-border); transition: 0.5s;
+        }
+        .header-top { display: flex; align-items: center; padding: 15px; justify-content: space-between; }
+        .search-box {
+            background: rgba(255,255,255,0.1); border-radius: 20px; padding: 8px 15px;
+            flex-grow: 1; margin: 0 15px; display: flex; align-items: center;
+        }
+        .search-box input { background: transparent; border: none; width: 100%; outline: none; color: white; }
+        
+        /* Botón Notas Rediseñado (Header) */
+        .notes-header-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--accent); 
+            color: var(--accent); border-radius: 20px; padding: 8px 15px; 
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: bold; transition: 0.3s; white-space: nowrap;
+        }
+        .notes-header-btn:hover { background: var(--accent); color: #000; }
+
+        .nav-tabs { display: flex; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--ui-border); }
+        .nav-tabs button {
+            flex: 1; padding: 15px 0; background: none; border: none; font-size: 11px; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s;
+        }
+        .nav-tabs button.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+
+        .page-section { display: none; padding-top: 15px; animation: fadeIn 0.4s; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from {opacity:0; transform:translateY(10px)} to {opacity:1; transform:translateY(0)} }
+
+        .shelf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0px 10px; padding: 15px 10px 70px 10px; overflow-y: auto; }
+        
+        .book-wrapper { 
+            position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; 
+            height: 160px; perspective: 600px; z-index: 10; padding-bottom: 12px; 
+        }
+        
+        .book-title { display: none; }
+
+        .book-cover {
+            height: 120px !important; width: auto !important; max-width: 80px;           
+            aspect-ratio: 2/3; object-fit: cover; border-radius: 2px;
+            transform: rotateY(-12deg); transform-origin: left center;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.6); border-left: 2px solid rgba(255,255,255,0.3);
+            background: #333; margin-bottom: 2px; transition: 0.3s; margin: 0 auto; 
+        }
+        .book-cover.generated {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 5px; text-align: center; font-size: 10px; color: white;
+            box-sizing: border-box; background: linear-gradient(45deg, #333, #555);
+        }
+        .book-wrapper:active .book-cover { transform: rotateY(0deg) scale(0.95); }
+
+        .admin-controls {
+            position: absolute; top: -15px; right: -10px; z-index: 50; display: flex; gap: 5px;
+        }
+        .icon-btn {
+            width: 26px; height: 26px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            border: 1px solid white; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+        .delete-btn { background: #ff1744; color: white; }
+        .edit-btn { background: #ffea00; color: black; }
+
+        .video-card {
+            background: rgba(0,0,0,0.3); border-radius: 12px; overflow: hidden;
+            margin-bottom: 20px; border: 1px solid var(--ui-border); display: flex; flex-direction: column; position: relative;
+        }
+        .video-thumb {
+            width: 100%; height: 180px; object-fit: cover; background: #000;
+            display: block; cursor: pointer;
+        }
+        .video-info { padding: 15px; }
+        .video-title { font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+        .video-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+        #versiculo-container {
+            position: relative; min-height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding: 20px; text-align: center;
+        }
+        .leaf {
+            position: absolute; top: -30px; width: 25px; height: 25px; font-size: 20px; color: rgba(255, 165, 0, 0.7);
+            z-index: 15; pointer-events: none; animation: fall linear infinite;
+        }
+        .leaf::after { content: '🍂'; } 
+        @keyframes fall {
+            0% { transform: translateY(-30px) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        #videos { position: relative; overflow: hidden; min-height: 100vh; }
+        .rain {
+            position: absolute; top: -20px; width: 2px; height: 15px;
+            background: var(--accent); opacity: 0.6; z-index: 5; pointer-events: none;
+            animation: fallRain linear infinite;
+        }
+        @keyframes fallRain { to { transform: translateY(100vh); } }
+
+        .verse-card-display {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            padding: 30px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-top: 40px; z-index: 10;
+            max-width: 90%; width: 100%; box-sizing: border-box;
+        }
+        .verse-img {
+            width: 100%; border-radius: 10px; margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); object-fit: cover;
+        }
+
+        /* MODALS (GENERAL) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 9000; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #222; border: 1px solid var(--ui-border); border-radius: 16px;
+            padding: 30px; text-align: center; max-width: 300px; width:90%; animation: popIn 0.3s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        @keyframes popIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
+        /* Botón Notas Intro */
+        .intro-note-btn { 
+            background: rgba(0, 229, 255, 0.05); border: 1px solid var(--accent); 
+            color: var(--text-main); width: 100%; padding: 12px; border-radius: 8px; 
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center; 
+            gap: 10px; cursor: pointer; font-weight: bold; font-size: 14px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .drawer {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background: var(--bg-wall); color: var(--text-main); z-index: 2000; transition: 0.3s;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.9); display: flex; flex-direction: column;
+            border-right: 1px solid var(--ui-border);
+        }
+        .drawer.open { left: 0; }
+        .drawer-header { background: rgba(0,0,0,0.2); padding: 30px 20px; border-bottom: 1px solid var(--ui-border); }
+        .drawer-item { padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 15px; align-items: center; color: var(--text-muted); }
+        .drawer-item svg { fill: var(--text-muted); } .drawer-item:active svg { fill: var(--accent); }
+
+        .bottom-bar {
+            position: fixed; bottom: 0; width: 100%; background: var(--header-bg); height: 60px;
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid var(--ui-border); z-index: 500; backdrop-filter: blur(10px);
+        }
+        .nav-item { background: none; border: none; font-size: 10px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; }
+        .nav-item.active-btn { color: var(--accent); }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 3px; fill: currentColor; }
+        
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 1500; backdrop-filter: blur(5px); }
+        .icon { width: 20px; height: 20px; fill: currentColor; }
+        .fav-heart { position: absolute; top: 5px; right: 5px; z-index: 30; fill: rgba(255,255,255,0.7); filter: drop-shadow(0 2px 2px black); }
+        .fav-heart.active { fill: #ff0055; filter: drop-shadow(0 0 8px #ff0055); }
+
+    </style>
+        <script>window.gapiLoaded = function() { console.log("Google API preparado"); };</script>
+
+</head>
+<body>
+
+<div id="offline-indicator">⚠️ Sin conexión a internet</div>
+<div id="massive-progress-container" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(20,20,25,0.98); border:1px solid var(--accent); padding:25px; border-radius:15px; z-index:10000; text-align:center; box-shadow:0 0 40px rgba(0,0,0,0.9); width:80%; max-width:350px;">
+    <h3 style="color:var(--accent); margin-top:0;">📥 Importando Libros</h3>
+    <div style="width:100%; background:rgba(255,255,255,0.1); border-radius:10px; height:20px; margin:20px 0; overflow:hidden; border:1px solid var(--ui-border);">
+        <div id="massive-progress-bar" style="width:0%; height:100%; background:var(--accent); transition:0.3s; box-shadow:0 0 10px var(--accent-glow);"></div>
+    </div>
+    <p id="massive-progress-text" style="color:var(--text-main); font-size:14px; margin:0; font-weight:bold;">Iniciando...</p>
+</div>
+
+<div id="overlay" class="overlay" onclick="toggleDrawer()"></div>
+
+<button class="fab-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
+    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+</button>
+<div id="notes-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color:var(--accent); margin-top:0; font-family:'Courier New', monospace;">📝 BLOC DE NOTAS</h3>
+        <p style="font-size:10px; color:var(--text-muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">Guardado Localmente</p>
+        <textarea id="user-notes" class="notes-textarea" rows="10" placeholder="Escribe tus pensamientos, versículos o ideas..."></textarea>
+        <div style="display:flex; gap:10px; margin-top:15px; justify-content:flex-end;">
+            <button class="btn-neon" style="border-color:rgba(255,255,255,0.2); color:#aaa; font-size:11px; padding:8px 15px;" onclick="document.getElementById('notes-modal').style.display='none'">CERRAR</button>
+            <button class="btn-neon" style="font-size:11px; padding:8px 15px; background:var(--accent-glow);" onclick="saveNotes()">GUARDAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="profile-setup-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="font-size:40px; margin-bottom:10px">👋</div>
+        <h3 style="color:var(--accent); margin:0 0 5px 0;">¡Bienvenido/a!</h3>
+        <p style="color:var(--text-main); font-size:13px; margin-bottom:20px;">Configura tu perfil para la comunidad.</p>
+        
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">TU APODO / NICKNAME</label>
+        <input type="text" id="profile-nick" class="input-box" style="margin-top:0; text-align:center;" placeholder="Ej: Juan_316">
+        
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:10px;">ELIGE TU AVATAR</label>
+        <div class="avatar-grid">
+            <div class="avatar-option" onclick="selectAvatar('👨', this)">👨</div>
+            <div class="avatar-option" onclick="selectAvatar('👩', this)">👩</div>
+            <div class="avatar-option" onclick="selectAvatar('👦', this)">👦</div>
+            <div class="avatar-option" onclick="selectAvatar('👧', this)">👧</div>
+            <div class="avatar-option" onclick="selectAvatar('👤', this)">👤</div>
+        </div>
+        <input type="hidden" id="selected-avatar-val">
+
+        <div class="terms-container">
+            <input type="checkbox" id="terms-check" onchange="toggleSaveBtn()">
+            <span>Acepto los <span class="terms-link" onclick="showTerms()">Términos y Condiciones</span> de la comunidad.</span>
+        </div>
+
+        <button id="btn-save-profile" class="btn-neon" onclick="saveUserProfile()" disabled>GUARDAR Y CONTINUAR</button>
+    </div>
+</div>
+
+<div id="terms-modal" class="modal-overlay" style="z-index:10001;">
+    <div class="modal-content" style="text-align:left; max-height:60vh; overflow-y:auto;">
+        <h4 style="color:var(--accent); margin-top:0;">📜 Reglas de Convivencia</h4>
+        <ul style="font-size:12px; color:var(--text-muted); padding-left:15px; line-height:1.6;">
+            <li>Respeto mutuo y lenguaje apropiado.</li>
+            <li>No publicar contenido ofensivo o spam.</li>
+            <li>El Admin puede bloquear usuarios conflictivos.</li>
+            <li>La app se reserva el derecho de admisión.</li>
+        </ul>
+        <button class="btn-neon" onclick="document.getElementById('terms-modal').style.display='none'">ENTENDIDO</button>
+    </div>
+</div>
+
+<div id="update-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="font-size:40px; margin-bottom:10px">🚀</div>
+        <h3 id="upd-title" style="color:var(--accent); margin:0 0 10px 0;">Nueva Versión</h3>
+        <p id="upd-msg" style="color:var(--text-main); font-size:14px; margin-bottom:20px;">Hay una actualización disponible.</p>
+        <button id="upd-btn" class="btn-neon">DESCARGAR AHORA</button>
+        <div style="margin-top:15px;">
+            <button onclick="document.getElementById('update-modal').style.display='none'" style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer;">Quizás luego</button>
+        </div>
+    </div>
+</div>
+<div id="admin-login-modal" class="modal-overlay" style="z-index:10002;">
+    <div class="modal-content">
+        <h3 style="color:var(--accent); margin-top:0;">🛡️ Acceso Admin</h3>
+        <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Inicia sesión con tu cuenta de administrador.</p>
+        <input type="email" id="admin-email" class="input-box" placeholder="Correo electrónico" style="margin-bottom:10px; padding:10px;">
+        <input type="password" id="admin-pass" class="input-box" placeholder="Contraseña" style="margin-bottom:20px; padding:10px;">
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="document.getElementById('admin-login-modal').style.display='none'">CANCELAR</button>
+            <button class="btn-neon" style="font-size:11px; padding:8px;" onclick="loginAdmin()">ENTRAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="success-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="font-size:40px; margin-bottom:10px">✨</div>
+        <h3 id="modal-title" style="color:var(--text-main); margin:0 0 10px 0;">¡Éxito!</h3>
+        <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Operación realizada.</p>
+        <button class="btn-neon" onclick="closeModal()">CERRAR</button>
+    </div>
+</div>
+
+<div id="edit-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color:var(--accent); margin-top:0">✏️ Editar</h3>
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="edit-collection">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Título</label>
+        <input type="text" id="edit-title-input" class="input-box" style="margin-bottom:10px">
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Descripción / Autor</label>
+        <textarea id="edit-desc-input" class="input-box" rows="3" style="margin-bottom:10px"></textarea>
+        
+        <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Link / URL</label>
+        <input type="text" id="edit-link-input" class="input-box" style="margin-bottom:10px">
+        
+                <label style="font-size:10px; color:var(--text-muted); display:block; text-align:left">Imagen Portada (URL)</label>
+        <input type="text" id="edit-img-input" class="input-box" style="margin-bottom:10px">
+        <button type="button" class="btn-neon" style="margin-bottom:20px; font-size:10px; padding:8px;" onclick="openCloudinaryWidgetForCover('edit-img-input')">🖼️ SUBIR PORTADA CON CLOUDINARY</button>
+
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn-neon" style="border-color:#555; color:#aaa" onclick="document.getElementById('edit-modal').style.display='none'">CANCELAR</button>
+            <button class="btn-neon" onclick="saveEdit()">GUARDAR</button>
+        </div>
+    </div>
+</div>
+<div id="pdf-confirm-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color:var(--accent); margin-top:0">📖 Abrir Libro</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">¿Deseas abrir este libro para leerlo?</p>
+                <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="document.getElementById('pdf-confirm-modal').style.display='none'">CANCELAR</button>
+            <button id="btn-read-pdf" class="btn-neon" style="font-size:11px; padding:8px; background:var(--accent-glow);">📖 LEER ONLINE</button>
+            <button id="btn-download-pdf" class="btn-neon" style="font-size:11px; padding:8px;">⬇️ DESCARGAR</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="drawer" class="drawer">
+    <div class="drawer-header">
+        <h2 style="margin:0; color:var(--accent); text-shadow:0 0 10px var(--accent-glow)">Mi Biblioteca</h2>
+        <small style="color:var(--text-muted)">La verdad de Dios, al alcance de todos</small>
+    </div>
+    <div style="flex:1; overflow-y:auto">
+        <div class="drawer-item" onclick="navigate('recientes'); toggleDrawer()"><svg class="icon"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio</div>
+        <div class="drawer-item" onclick="navigate('configuracion'); toggleDrawer()"><svg class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Personalización</div>
+        <div class="drawer-item" onclick="navigate('publicar'); toggleDrawer()"><svg class="icon"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg> Publicar</div>
+        <div class="drawer-item" onclick="navigate('donacion'); toggleDrawer()"><svg class="icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Donación</div>
+        <div class="drawer-item" onclick="navigate('pedir'); toggleDrawer()"><svg class="icon"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> Pedir Libro</div>
+        <div class="drawer-item" onclick="navigate('ayuda'); toggleDrawer()"><svg class="icon"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda y Reportes</div>
+    </div>
+</div>
+<header class="app-header">
+    <div class="header-top">
+        <div class="menu-btn" onclick="toggleDrawer()" style="color:var(--text-main); font-size:24px; cursor:pointer; margin-right:10px;">☰</div>
+        
+        <div class="search-box">
+            <span style="color:#777">🔍</span> 
+            <input type="text" id="searchInput" placeholder="Buscar libro..." onkeyup="searchBooks(this.value)">
+        </div>
+
+        <button class="notes-header-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
+            📝 Notas
+        </button>
+    </div>
+        
+
+    <nav class="nav-tabs">
+        <button id="tab-recientes" class="active" onclick="navigate('recientes')">Inicio</button>
+        <button id="tab-nube" onclick="navigate('nube')">Nube</button>
+        <button id="tab-versiculo" onclick="navigate('versiculo')">Versículo</button>
+        <button id="tab-videos" onclick="navigate('videos')">Videos</button>
+        <button id="tab-debate" onclick="navigate('debate')">Comunidad</button>
+    </nav>
+</header>
+<main id="main-content">
+
+    <div id="recientes" class="page-section active">
+                <div style="padding: 10px 10px 0 10px;">
+            <button class="intro-note-btn" style="border-color:#ffcc00; color:#ffcc00; flex-direction: column; text-align: center; padding: 15px;" onclick="const ads=['https://www.effectivegatecpm.com/bju7faig6?key=d4c087ca3524b4bee6f6c8bd9e5c8d9e','https://ukuleqasforsalesre.com?tid=1248841','https://omg10.com/4/10744381']; window.open(ads[Math.floor(Math.random()*ads.length)], '_blank'); alert('¡Gracias por apoyar la app! Estás ayudando a mantener los servidores activos.');">
+                <span style="font-size: 15px;">🤝 Apoya esta app y sus servidores</span>
+                <span style="font-size: 10px; font-weight: normal; margin-top: 5px; color: #ccc;">Haz clic para ver una publicidad (puedes hacerlo hasta 3 veces)</span>
+            </button>
+        </div>
+
+        <div class="shelf-grid" id="grid-recientes"></div>
+                <div style="text-align:center; padding:10px; margin-bottom:20px; grid-column: 1 / -1;">
+            <p id="load-more-info" style="font-size:11px; color:var(--text-muted); margin-bottom:10px;"></p>
+            <button id="btn-load-more" class="btn-neon" style="display:none; width:auto; padding:10px 30px; font-size:12px; margin:0 auto;" onclick="loadMoreBooks()">CARGAR MÁS LIBROS</button>
+        </div>
+
+    </div>
+
+    <div id="nube" class="page-section">
+        <div class="shelf-grid" id="grid-nube"></div>
+    </div>
+
+    <div id="versiculo" class="page-section">
+        <div id="versiculo-container">
+            <div id="admin-verse-form" style="display:none; width:100%; margin-bottom:20px; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px;">
+                <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Versículo Diario</h4>
+                <input type="text" id="verseTitle" class="input-box" placeholder="Título (ej: La Paz)" style="margin-bottom:5px">
+                <textarea id="verseText" class="input-box" rows="3" placeholder="Texto o descripción del versículo..." style="margin-bottom:5px"></textarea>
+                <input type="url" id="verseImgUrl" class="input-box" placeholder="URL de la imagen" style="margin-bottom:5px">
+                <button class="btn-neon" onclick="updateDailyVerse()">PUBLICAR</button>
+                <button class="btn-neon" onclick="deleteDailyVerse()" style="margin-top:10px; background:red; border-color:red; color:white;">ELIMINAR VERSÍCULO</button>
+            </div>
+
+            <div class="verse-card-display">
+                <img id="displayVerseImg" class="verse-img" src="" style="display:none">
+                <h2 id="displayVerseTitle" style="color:var(--accent); margin-top:0;"></h2>
+                <p id="displayVerseText" style="color:#fff; font-family:'Georgia', serif; font-style:italic; font-size:16px; line-height:1.5;"></p>
+                <p id="verseDate" style="color:var(--text-muted); font-size:12px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="debate" class="page-section">
+        <div style="max-width: 600px; margin: 0 auto; padding: 10px;">
+            
+            <div style="text-align:center;">
+                <div class="online-counter">
+                    <div class="online-dot"></div>
+                    <span id="live-user-count">Calculando...</span> usuarios leyendo ahora
+                </div>
+            </div>
+
+            <div id="feed-login-prompt" style="text-align:center; padding:30px; background:var(--ui-bg); border-radius:12px; margin-bottom:20px; border:1px solid var(--ui-border);">
+                <div style="font-size:50px; margin-bottom:10px">👥</div>
+                <h3 style="color:var(--accent); margin-top:0">Únete a la Comunidad</h3>
+                <p style="color:var(--text-muted); font-size:13px;">Inicia sesión para publicar temas, dar likes y comentar.</p>
+                <button class="btn-google" onclick="loginWithGoogle()" style="margin:20px auto; width:80%;">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                    Iniciar Sesión con Google
+                </button>
+            </div>
+
+            <div id="create-post-container" class="create-post-card" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span id="user-avatar-display" class="post-avatar">?</span>
+                        <span id="user-name-display" style="font-weight:bold; color:var(--text-main); font-size:14px;">Usuario</span>
+                    </div>
+                    <button id="btn-logout-feed" onclick="logout()" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; font-size:11px; cursor:pointer;">Cerrar sesión</button>
+                </div>
+                
+                <input type="text" id="postTitle" class="input-box" placeholder="Título de tu tema..." style="margin-bottom:8px; padding:10px;">
+                <textarea id="postBody" class="input-box" rows="3" placeholder="Comparte una reflexión o pregunta..." style="margin-bottom:10px; padding:10px;"></textarea>
+                <button class="btn-neon" onclick="createPost()">PUBLICAR</button>
+            </div>
+
+            <div id="feed-container" class="social-feed">
+                <p style="text-align:center; color:#666; padding:20px;">Cargando...</p>
+            </div>
+        </div>
+    </div>
+    <div id="videos" class="page-section">
+        <div id="video-upload-form" style="display:none; margin:15px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px; z-index:20; position:relative;">
+            <h4 style="margin:0 0 10px 0; color:var(--accent)">🎥 Compartir Video (YouTube)</h4>
+            <input type="text" id="vidTitle" class="input-box" placeholder="Título del Video">
+            <input type="text" id="vidDesc" class="input-box" placeholder="Descripción breve">
+            <input type="url" id="vidUrl" class="input-box" placeholder="Link de YouTube">
+            <button class="btn-neon" onclick="uploadVideo()">AGREGAR VIDEO</button>
+        </div>
+        
+        <div id="btn-show-video-form" style="padding:15px; text-align:center; display:none;">
+            <button class="btn-neon" onclick="toggleVideoForm()" style="font-size:12px; padding:8px 20px;">+ SUBIR VIDEO</button>
+        </div>
+
+        <div id="video-list" style="padding:15px; padding-bottom:80px; z-index:10; position:relative;"></div>
+    </div>
+    <div id="favoritos" class="page-section">
+        <h2 style="text-align:center;color:var(--text-main);text-shadow:0 0 10px var(--accent);">Mis Favoritos ❤️</h2>
+        <div class="shelf-grid" id="grid-favoritos"></div>
+    </div>
+
+    <div id="configuracion" class="page-section">
+        <div class="glass-panel">
+            <h2 style="margin-top:0; color:var(--accent); text-align:center"> Atmósfera de Lectura</h2>
+            <div class="theme-grid">
+                <div class="theme-card active" onclick="changeTheme('default', this)"><div class="theme-preview-circle" style="background:#1e1e24; border-color:#555"></div><div class="theme-name">Dark Slate</div></div>
+                <div class="theme-card" onclick="changeTheme('orange', this)"><div class="theme-preview-circle" style="background:#1a1008; border-color:#ff6d00"></div><div class="theme-name">Energetic Orange</div></div>
+                <div class="theme-card" onclick="changeTheme('silver', this)"><div class="theme-preview-circle" style="background:#212121; border-color:#b0bec5"></div><div class="theme-name">Sleek Silver</div></div>
+                <div class="theme-card" onclick="changeTheme('red', this)"><div class="theme-preview-circle" style="background:#1a0505; border-color:#ff1744"></div><div class="theme-name">Crimson Red</div></div>
+                <div class="theme-card" onclick="changeTheme('blue', this)"><div class="theme-preview-circle" style="background:#050a1a; border-color:#2979ff"></div><div class="theme-name">Royal Blue</div></div>
+                <div class="theme-card" onclick="changeTheme('green', this)"><div class="theme-preview-circle" style="background:#051a0a; border-color:#00e676;"></div><div class="theme-name">Emerald Green</div></div>
+                <div class="theme-card" onclick="changeTheme('purple', this)"><div class="theme-preview-circle" style="background:#12051a; border-color:#d500f9;"></div><div class="theme-name">Deep Purple</div></div>
+                <div class="theme-card" onclick="changeTheme('gold', this)"><div class="theme-preview-circle" style="background:#141005; border-color:#ffca28;"></div><div class="theme-name">Luxury Gold</div></div>
+            </div>
+            
+            <div style="text-align:center; margin-top:20px;">
+                <button onclick="toggleAdminMode()" style="background:none; border:1px solid #444; padding:5px 15px; border-radius:15px; color:var(--text-muted); font-size:10px; cursor:pointer;">Admin Mode</button>
+            </div>
+                        <div id="admin-api-vault" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; text-align:center;">
+                <h3 style="color:var(--accent); margin-bottom:10px;">🔐 Bóveda de APIs</h3>
+                <input type="password" id="vaultDropbox" class="input-box" placeholder="Token de Dropbox" style="margin-bottom:5px;">
+                <input type="password" id="vaultDriveClient" class="input-box" placeholder="Client ID Drive" style="margin-bottom:5px;">
+                <input type="password" id="vaultDriveApi" class="input-box" placeholder="API Key Drive" style="margin-bottom:5px;">
+                                <input type="password" id="vaultDriveApp" class="input-box" placeholder="App ID Drive" style="margin-bottom:15px;">
+                <button type="button" class="btn-neon" onclick="const t = document.getElementById('vaultDropbox').type === 'password' ? 'text' : 'password'; document.getElementById('vaultDropbox').type = t; document.getElementById('vaultDriveClient').type = t; document.getElementById('vaultDriveApi').type = t; document.getElementById('vaultDriveApp').type = t;" style="margin-bottom:10px; border-color:#888; color:#aaa;">👁️ MOSTRAR/OCULTAR CLAVES</button>
+                <button class="btn-neon" onclick="saveApiKeys()" style="margin-bottom:10px;">GUARDAR CLAVES</button>
+
+                <button class="btn-neon" onclick="importFromDrive()" style="background:rgba(0,230,118,0.2); border-color:#00e676; color:#00e676;">📥 IMPORTACIÓN MASIVA DRIVE</button>
+                                <button class="btn-neon" onclick="toggleMultiSelectMode()" style="background:rgba(255,234,0,0.2); border-color:#ffea00; color:#ffea00; margin-top:10px;">☑️ MODO SELECCIÓN MÚLTIPLE</button>
+                <button id="btn-delete-selected" class="btn-neon" onclick="deleteSelectedBooks()" style="display:none; background:rgba(255,23,68,0.2); border-color:#ff1744; color:#ff1744; margin-top:10px;">🗑️ ELIMINAR SELECCIONADOS</button>
+                <button class="btn-neon" onclick="scanAndRemoveDuplicates()" style="background:rgba(213,0,249,0.2); border-color:#d500f9; color:#d500f9; margin-top:10px;">🕵️ ESCANEAR DUPLICADOS</button>
+
+            </div>
+
+<button id="btn-admin-dropbox" onclick="importFromDropbox()" style="display:none; background:rgba(0,100,255,0.2); border:1px solid #0064ff; padding:5px 15px; border-radius:15px; color:#0064ff; font-size:10px; cursor:pointer; margin-left:10px;">📥 IMPORTACIÓN MASIVA DROPBOX</button>
+            <div id="admin-update-form" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+                <h3 style="color:var(--accent); text-align:center; margin-bottom:5px;">🔔 Configurar Alerta</h3>
+                                <label style="font-size:10px; color:var(--accent);">ESTADO DEL AVISO</label>
+                <select id="updStatus" class="input-box" style="padding:10px; height:auto; margin-bottom:10px; background:#111;">
+                    <option value="off">🔴 Desactivado</option>
+                    <option value="on">🟢 Activado (Visible al entrar)</option>
+                </select>
+                <label style="font-size:10px; color:var(--accent);">VERSIÓN DE LA NUEVA APP</label>
+                <input type="text" id="updVersionInput" class="input-box" placeholder="Ej: 2.0 (Solo se mostrará si la versión es distinta)" style="margin-bottom:10px;">
+                <label style="font-size:10px; color:var(--accent);">TÍTULO DE LA VENTANA</label>
+
+                <input type="text" id="updTitleInput" class="input-box" placeholder="Ej: ¡Nueva Versión Disponible!">
+                <label style="font-size:10px; color:var(--accent);">MENSAJE / TEXTO</label>
+                <textarea id="updMsgInput" class="input-box" rows="2" placeholder="Ej: Descarga la nueva..."></textarea>
+                <label style="font-size:10px; color:var(--accent);">LINK DE DESCARGA</label>
+                <input type="text" id="updLinkInput" class="input-box" placeholder="https://...">
+                <button class="btn-neon" onclick="saveUpdateConfig()">GUARDAR CONFIGURACIÓN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="publicar" class="page-section">
+        <div class="glass-panel">
+            <h2 style="color:var(--accent);margin-top:0;"> Subir a la Nube</h2>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:15px">Agrega un libro a la base de datos pública.</p>
+                       <form id="publishForm" onsubmit="handleGenericForm(event, '¡Publicado!', 'El libro está disponible para todos.')">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">MÉTODO DE SUBIDA</label>
+                                <select id="uploadType" class="input-box" onchange="toggleUploadUI()">
+                    <option value="link">Tengo un Link</option>
+                    <option value="cloudinary">Cloudinary</option>
+                    <option value="dropbox">Dropbox</option>
+                    <option value="drive">Google Drive</option>
+                </select>
+
+
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">TÍTULO</label>
+                <input type="text" id="pubTitle" class="input-box" required placeholder="Título del libro">
+                <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">AUTOR</label>
+                <input type="text" id="pubAuthor" class="input-box" required placeholder="Nombre del Autor">
+                              
+
+                                <div id="manualLinksContainer">
+                    <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PDF (Google Drive/Dropbox)</label>
+                    <input type="url" id="pubLink" class="input-box" placeholder="https://...">
+                </div>
+
+                <div id="coverLinksContainer" style="margin-bottom:15px;">
+                    <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PORTADA (Opcional)</label>
+                    <input type="url" id="pubCover" class="input-box" placeholder="https://... (Si está vacío, se genera sola)" style="margin-bottom:10px;">
+                    <button type="button" class="btn-neon" style="margin-bottom:10px; font-size:10px; padding:8px;" onclick="openCloudinaryWidgetForCover('pubCover')">🖼️ SUBIR PORTADA CON CLOUDINARY</button>
+                </div>
+
+
+                <div id="fileUploadContainer" style="display:none; text-align:center; margin-bottom:15px;">
+                    <input type="file" id="fileSelector" style="display:none" accept=".pdf,.epub">
+                    <button type="button" id="btnCloudinary" class="btn-neon" style="display:none;" onclick="openCloudinaryWidget()">☁️ SUBIR A CLOUDINARY</button>
+                    <button type="button" id="btnDropboxFile" class="btn-neon" style="display:none;" onclick="document.getElementById('fileSelector').click()">📦 SELECCIONAR ARCHIVO</button>
+                    <button type="button" id="btnDriveFile" class="btn-neon" style="display:none;" onclick="handleDriveAuthClick()">📁 SELECCIONAR DE DRIVE</button>
+                    <p id="fileStatus" style="font-size:11px; color:var(--accent); margin-top:10px;"></p>
+                </div>
+
+                <button type="button" id="btnFinalPublish" class="btn-neon filled" onclick="uploadBookToCloud()">PUBLICAR AHORA</button>
+                                <div id="single-upload-progress" style="display:none; width:100%; background:rgba(255,255,255,0.1); border-radius:10px; height:8px; margin-top:15px; overflow:hidden;">
+                    <div style="width:40%; height:100%; background:var(--accent); animation: loadingBarSingle 1s infinite alternate; box-shadow:0 0 8px var(--accent-glow);"></div>
+                </div>
+                <style>@keyframes loadingBarSingle { from { transform: translateX(-100%); } to { transform: translateX(250%); } }</style>
+
+            </form>
+
+        </div>
+    </div>
+
+    <div id="donacion" class="page-section">
+        <div class="glass-panel" style="text-align:center">
+            <h2 style="color:#ffcc00; text-shadow:0 0 15px rgba(255,215,0,0.6)">Donaciones</h2>
+            <p style="font-size:14px; color:var(--text-muted)">Tu apoyo mantiene los servidores activos y la verdad al alcance de todos.</p>
+            <div style="font-size:50px; margin:20px 0; animation: float 3s ease-in-out infinite;">🤝</div>
+            <button class="btn-neon" style="background:rgba(255,204,0,0.1); border-color:#ffcc00; color:#ffcc00" onclick="window.open('https://www.paypal.com/donate/?hosted_button_id=5YA3A93HWYMRA','_blank')">❤️ Donar con PayPal</button>
+        </div>
+    </div>
+
+    <div id="pedir" class="page-section">
+        <div class="glass-panel">
+            <h2 style="color:var(--accent)">Solicitar Libro</h2>
+            <p style="font-size:12px; color:var(--text-muted)">Haremos lo posible por conseguirlo.</p>
+            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Solicitud Enviada', '¡Gracias! Buscaremos el libro.')">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="Pedido de Libro">
+                <input type="text" name="libro" class="input-box" placeholder="Nombre del Libro" required>
+                <input type="text" name="autor" class="input-box" placeholder="Autor (Opcional)">
+                <button type="submit" class="btn-neon">ENVIAR PEDIDO</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="ayuda" class="page-section">
+        <div class="glass-panel">
+            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); letter-spacing:1px; font-size:18px; text-align:center; width:100%">PREGUNTAS FRECUENTES</h2>
+            
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Esta biblioteca es totalmente gratuita?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Sí, el acceso a la lectura y descarga de materiales en PDF y ePub es gratuito. Nuestro propósito es facilitar el acceso a la literatura cristiana para edificación de todos. Sin embargo, creemos firmemente que "el obrero es digno de su salario" (1 Timoteo 5:18). Por ello, recomendamos encarecidamente que, si tienes la solvencia económica, compres el libro directamente a su autor o en su tienda oficial para bendecir su ministerio.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Por qué hay publicidad en la aplicación y el sitio web?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    La publicidad nos permite mantener la plataforma en línea, cubrir los costos de servidores, almacenamiento y mantenimiento técnico para que el servicio siga estando disponible para todos, especialmente para aquellos que no tienen recursos para adquirir libros.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ Si hago una donación, ¿se elimina la publicidad?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    No. Hemos decidido mantener la publicidad general para sostener la infraestructura técnica básica. Las donaciones tienen un propósito diferente y más noble: se utilizan para apoyar económicamente a los autores independientes dentro de nuestra plataforma y para adquirir legalmente nuevos libros y licencias para ampliar la biblioteca comunitaria.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿A dónde va el dinero de los ingresos y donaciones?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Operamos bajo un modelo de transparencia y mayordomía. Los fondos se distribuyen de la siguiente manera:<br>
+                    • Mantenimiento técnico de la web y la app.<br>
+                    • Un porcentaje se destina como beneficio directo a los autores asociados.<br>
+                    • Compra de nuevo material bibliográfico para ponerlo a disposición de los usuarios.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Puedo importar mis propios archivos a la aplicación?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Sí. Nuestra app cuenta con una función de "Importar Archivos" que te permite cargar tus propios PDF y ePubs para que puedas usar nuestra plataforma como tu lector personal y tener toda tu biblioteca organizada en un solo lugar.
+                </p>
+            </details>
+
+            <details style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px">
+                <summary style="font-weight:bold; cursor:pointer; color:var(--text-main); list-style:none">▼ ¿Qué hago si encuentro un libro que infringe derechos de autor?</summary>
+                <p style="font-size:13px; margin-top:10px; line-height:1.6; color:var(--text-muted); padding-left:15px">
+                    Respetamos profundamente la propiedad intelectual y el trabajo de los escritores cristianos. Si eres el autor o representante legal de una obra y deseas que sea retirada o gestionar sus derechos, por favor utiliza nuestro Formulario de Reporte. Atenderemos tu solicitud a la brevedad posible para actuar conforme a la ley y a la ética cristiana.
+                </p>
+            </details>
+
+            <br>
+            <h2 style="border-bottom: 1px solid var(--accent); padding-bottom:10px; color:var(--accent); font-size:16px;"> REPORTE Y GESTIÓN</h2>
+            <p style="font-size:11px; margin-bottom:20px; color:var(--text-muted); text-align:center">Para errores técnicos, enlaces rotos o gestión de derechos de autor.</p>
+
+            <form action="https://formsubmit.co/mancillacanales992@gmail.com" method="POST" onsubmit="handleGenericForm(event, 'Reporte Enviado', 'Revisaremos tu caso a la brevedad.')">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="REPORTE URGENTE - APP BIBLIOTECA">
+                
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">1. DATOS DE CONTACTO</div>
+                <input type="text" name="nombre" class="input-box" placeholder="Nombre Completo" required>
+                <input type="email" name="email" class="input-box" placeholder="Email" required>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">2. DETALLES</div>
+                <input type="text" name="recurso" class="input-box" placeholder="Título del Libro / URL" required>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">3. MOTIVO</div>
+                <select name="motivo" class="input-box" style="background:#222; color:white">
+                    <option>Infracción Derechos de Autor</option>
+                    <option>Archivo Dañado</option>
+                    <option>Información Incorrecta</option>
+                    <option>Contenido Inapropiado</option>
+                    <option>Otro</option>
+                </select>
+
+                <div style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:15px">4. MENSAJE / PRUEBAS</div>
+                <textarea name="mensaje" class="input-box" rows="4" placeholder="Detalles adicionales..."></textarea>
+
+                <label style="display:flex; gap:10px; font-size:11px; color:var(--text-muted); align-items:flex-start; margin-top:10px">
+                    <input type="checkbox" required>
+                    <span>Declaro que la información es verídica. Reportes falsos perjudican a la comunidad.</span>
+                </label>
+
+                <button type="submit" class="btn-neon filled" style="margin-top:20px">ENVIAR REPORTE</button>
+            </form>
+        </div>
+    </div>
+
+</main>
+
+<footer class="bottom-bar">
+    <button class="nav-item" onclick="navigate('recientes')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio
+    </button>
+    <button class="nav-item" onclick="navigate('favoritos')">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Favoritos
+    </button>
+    <button class="nav-item" onclick="window.open('https://youtube.com/@verdadesenm?si=JgKmzs7HcQtSTBVg','_blank')">
+        <svg viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg> Canal
+    </button>
+    <button class="nav-item" onclick="navigate('ayuda')">
+        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg> Ayuda
+    </button>
+</footer>
+<script type="module">
+        /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+               import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, getDoc, doc, onSnapshot, query, orderBy, serverTimestamp, where, limit, arrayUnion, arrayRemove, increment, getDocs, startAfter, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDLyZS-alUh5DOtBBtts-8D_hza-n71Y3I",
+        authDomain: "biblioteca-cristiano.firebaseapp.com",
+        projectId: "biblioteca-cristiano",
+        storageBucket: "biblioteca-cristiano.firebasestorage.app",
+        messagingSenderId: "737226922744",
+        appId: "1:737226922744:web:8746608081fef3355ff90d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app); 
+
+    /* --- 1.1 MANEJO RETORNO LOGIN (MÓVILES) --- */
+    getRedirectResult(auth)
+        .then((result) => {
+            if (result) console.log("Regreso de Google exitoso.");
+        })
+        .catch((error) => {
+            if (error.code !== 'auth/popup-closed-by-user') console.error("Error Login:", error);
+        });
+
+    /* --- 2. ESTADO GLOBAL --- */
+    let cloudBooks = []; 
+    let youtubeVideos = [];
+    let favorites = JSON.parse(localStorage.getItem('my_fav_books')) || [];
+        let updateConfig = { status: 'off', version: '', title: '', msg: '', link: '' }; 
+    const CURRENT_APP_VERSION = "2.0"; // Versión actual de la App
+    window.alert = function(msg) { showModal("Atención", msg); }; // Hack para eliminar "Esta página dice..."
+        let globalDriveClientId = "";
+
+    let globalDriveApiKey = "";
+    let globalDriveAppId = "";
+    let globalDropboxToken = "";
+
+    onSnapshot(doc(db, "configuracion", "api_keys"), (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            globalDriveClientId = data.driveClientId || "";
+            globalDriveApiKey = data.driveApiKey || "";
+            globalDriveAppId = data.driveAppId || "";
+            globalDropboxToken = data.dropboxToken || "";
+            
+            if (isAdminMode) {
+                const dropEl = document.getElementById('vaultDropbox');
+                if(dropEl) dropEl.value = globalDropboxToken;
+                const clientEl = document.getElementById('vaultDriveClient');
+                if(clientEl) clientEl.value = globalDriveClientId;
+                const apiEl = document.getElementById('vaultDriveApi');
+                if(apiEl) apiEl.value = globalDriveApiKey;
+                const appEl = document.getElementById('vaultDriveApp');
+                if(appEl) appEl.value = globalDriveAppId;
+            }
+        }
+    });
+
+    // VARIABLES DE SEGURIDAD Y CARGA
+    let isAdminMode = false;  // FALSE por defecto (Seguridad)
+        let isMultiSelectMode = false;
+    let selectedBooksIds = [];
+
+    let isLoading = true;     // Variable para controlar la animación de carga
+
+    let hasShownUpdate = false; 
+    let leavesInterval, rainInterval; 
+    let robotInterval; 
+    
+    // VARIABLES DE USUARIO
+    window.currentUser = null;       
+    window.currentUserProfile = null; 
+
+    /* --- 3. LISTENERS BASE DE DATOS (CONTENIDO) --- */
+    
+       // Libros (Paginación a 100)
+    window.lastVisibleBook = null;
+    window.totalBooksCount = 0;
+    window.loadedBooksCount = 0;
+
+    async function loadInitialBooks() {
+        isLoading = true;
+        const coll = collection(db, "libros");
+        try {
+            const countSnap = await getCountFromServer(coll);
+            window.totalBooksCount = countSnap.data().count;
+        } catch(e) { window.totalBooksCount = 100; }
+        
+        onSnapshot(query(coll, orderBy("timestamp", "desc"), limit(100)), (snapshot) => {
+            cloudBooks = [];
+            snapshot.forEach((doc) => cloudBooks.push({ id: doc.id, ...doc.data(), type: 'cloud' }));
+            if(!snapshot.empty) window.lastVisibleBook = snapshot.docs[snapshot.docs.length - 1];
+            window.loadedBooksCount = cloudBooks.length;
+            isLoading = false;
+            refreshActiveViews();
+            updateLoadMoreButton();
+        });
+    }
+    loadInitialBooks();
+
+    window.loadMoreBooks = async function() {
+        if (!window.lastVisibleBook) return;
+        const btn = document.getElementById('btn-load-more');
+        if(btn) btn.innerText = "Cargando...";
+        
+        const q = query(collection(db, "libros"), orderBy("timestamp", "desc"), startAfter(window.lastVisibleBook), limit(100));
+        const snap = await getDocs(q);
+        
+        snap.forEach((doc) => cloudBooks.push({ id: doc.id, ...doc.data(), type: 'cloud' }));
+        if(!snap.empty) {
+            window.lastVisibleBook = snap.docs[snap.docs.length - 1];
+            window.loadedBooksCount += snap.size;
+        } else {
+            window.lastVisibleBook = null;
+        }
+        
+        refreshActiveViews();
+        updateLoadMoreButton();
+    };
+
+    window.updateLoadMoreButton = function() {
+        const btn = document.getElementById('btn-load-more');
+        const info = document.getElementById('load-more-info');
+        if(!btn || !info) return;
+        
+        let totalPages = Math.ceil(window.totalBooksCount / 100) || 1;
+        let currentPage = Math.ceil(window.loadedBooksCount / 100) || 1;
+        
+        if (window.loadedBooksCount >= window.totalBooksCount || !window.lastVisibleBook) {
+            btn.style.display = 'none';
+            info.innerText = `Página ${currentPage} de ${totalPages} (Todos los libros mostrados)`;
+        } else {
+            btn.style.display = 'inline-block';
+            btn.innerText = "CARGAR MÁS LIBROS";
+            info.innerText = `Página ${currentPage} de ${totalPages}`;
+        }
+    };
+
+
+    // Videos
+    onSnapshot(query(collection(db, "videos"), orderBy("timestamp", "desc")), (snapshot) => {
+        youtubeVideos = [];
+        snapshot.forEach((doc) => youtubeVideos.push({ id: doc.id, ...doc.data() }));
+        refreshActiveViews();
+    });
+
+    // Versículo
+    onSnapshot(doc(db, "configuracion", "versiculo_diario"), (docSnap) => {
+        renderVerse(docSnap.exists() ? docSnap.data() : null);
+    });
+
+       // Configuración Alerta (ACTUALIZACIONES)
+    onSnapshot(doc(db, "configuracion", "alerta_update"), (docSnap) => {
+        if (docSnap.exists()) {
+            updateConfig = docSnap.data();
+            // Mostrar modal solo si está activo, no se ha mostrado, y ES UNA VERSIÓN NUEVA
+            if (updateConfig.status === 'on' && updateConfig.version !== CURRENT_APP_VERSION && !hasShownUpdate) {
+                document.getElementById('upd-title').innerText = updateConfig.title || "Actualización";
+                document.getElementById('upd-msg').innerText = updateConfig.msg || "Nueva versión disponible.";
+                const btn = document.getElementById('upd-btn');
+                btn.onclick = () => window.open(updateConfig.link, '_blank');
+                document.getElementById('update-modal').style.display = 'flex';
+                hasShownUpdate = true;
+            }
+            // Llenar formulario Admin si está activo
+            if (isAdminMode) {
+                document.getElementById('updStatus').value = updateConfig.status;
+                const vInp = document.getElementById('updVersionInput');
+                if(vInp) vInp.value = updateConfig.version || '';
+                document.getElementById('updTitleInput').value = updateConfig.title;
+                document.getElementById('updMsgInput').value = updateConfig.msg;
+                document.getElementById('updLinkInput').value = updateConfig.link;
+            }
+        }
+    });
+
+    function refreshActiveViews() {
+        if(document.getElementById('recientes').classList.contains('active')) renderLibrary('grid-recientes', cloudBooks);
+        if(document.getElementById('nube').classList.contains('active')) renderLibrary('grid-nube', cloudBooks);
+        if(document.getElementById('videos').classList.contains('active')) renderVideoList();
+        if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
+        toggleAdminForms(isAdminMode);
+    }
+       /* --- 4. ADMIN MODE (CONTROL TOTAL) --- */
+    window.toggleAdminMode = function() {
+        if (isAdminMode) {
+            isAdminMode = false;
+            toggleAdminForms(false);
+            alert("Modo Admin: DESACTIVADO");
+            refreshActiveViews();
+            updateUserUI(); 
+            initSocialFeed(); 
+            return;
+        }
+        document.getElementById('admin-login-modal').style.display = 'flex';
+    };
+
+    window.loginAdmin = async function() {
+        const em = document.getElementById('admin-email').value.trim();
+        const pw = document.getElementById('admin-pass').value;
+        if(em !== 'mancillacanales992@gmail.com') {
+            return alert("⛔ Acceso denegado. Solo el administrador principal.");
+        }
+        try {
+            await signInWithEmailAndPassword(auth, em, pw);
+            document.getElementById('admin-login-modal').style.display = 'none';
+            isAdminMode = true;
+            toggleAdminForms(true);
+            alert("✅ Modo Admin: ACTIVADO\nTienes CONTROL TOTAL.");
+            refreshActiveViews();
+            updateUserUI();   
+            initSocialFeed(); 
+            if(updateConfig) {
+                document.getElementById('updStatus').value = updateConfig.status || 'off';
+                const vInp = document.getElementById('updVersionInput');
+                if(vInp) vInp.value = updateConfig.version || '';
+                document.getElementById('updTitleInput').value = updateConfig.title || '';
+                document.getElementById('updMsgInput').value = updateConfig.msg || '';
+                document.getElementById('updLinkInput').value = updateConfig.link || '';
+            }
+            document.getElementById('admin-pass').value = '';
+        } catch(e) {
+            alert("⛔ Contraseña o correo incorrectos.");
+        }
+    };
+
+            function toggleAdminForms(show) {
+        const display = show ? 'block' : 'none';
+        const verseForm = document.getElementById('admin-verse-form');
+        const updForm = document.getElementById('admin-update-form');
+        const btnDropboxAdmin = document.getElementById('btn-admin-dropbox');
+        const apiVault = document.getElementById('admin-api-vault');
+        if(verseForm) verseForm.style.display = display;
+        if(updForm) updForm.style.display = display;
+        if(btnDropboxAdmin) btnDropboxAdmin.style.display = show ? 'inline-block' : 'none';
+        if(apiVault) apiVault.style.display = display;
+    }
+
+
+    /* --- 5. FUNCIONES CRUD GENERALES --- */
+    
+       window.saveApiKeys = async function() {
+        const data = {
+            dropboxToken: document.getElementById('vaultDropbox').value,
+            driveClientId: document.getElementById('vaultDriveClient').value,
+            driveApiKey: document.getElementById('vaultDriveApi').value,
+            driveAppId: document.getElementById('vaultDriveApp').value
+        };
+        try { await setDoc(doc(db, "configuracion", "api_keys"), data); showModal("Guardado", "Claves API actualizadas exitosamente."); } catch(e) { alert(e.message); }
+    };
+
+        window.saveUpdateConfig = async function() {
+        const data = {
+            status: document.getElementById('updStatus').value,
+            version: document.getElementById('updVersionInput').value,
+            title: document.getElementById('updTitleInput').value,
+            msg: document.getElementById('updMsgInput').value,
+            link: document.getElementById('updLinkInput').value
+        };
+        try { await setDoc(doc(db, "configuracion", "alerta_update"), data); showModal("Guardado", "Alerta actualizada."); } catch(e) { alert(e.message); }
+    };
+
+    window.deleteItem = async function(collectionName, id) {
+        if(event) event.stopPropagation();
+        if(!confirm("⚠️ ADMIN: ¿ELIMINAR ESTE ELEMENTO?")) return;
+        try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert("Error: " + e.message); }
+    };
+    window.toggleMultiSelectMode = function() {
+        isMultiSelectMode = !isMultiSelectMode;
+        selectedBooksIds = [];
+        document.getElementById('btn-delete-selected').style.display = isMultiSelectMode ? 'inline-block' : 'none';
+        refreshActiveViews();
+    };
+
+    window.toggleBookSelection = function(id, isChecked) {
+        if (isChecked) {
+            if (!selectedBooksIds.includes(id)) selectedBooksIds.push(id);
+        } else {
+            selectedBooksIds = selectedBooksIds.filter(itemId => itemId !== id);
+        }
+    };
+
+    window.deleteSelectedBooks = async function() {
+        if (selectedBooksIds.length === 0) return alert("No has seleccionado ningún libro.");
+        if (!confirm(`⚠️ ADMIN: ¿Estás seguro de eliminar ${selectedBooksIds.length} libros de forma permanente?`)) return;
+        
+        try {
+            document.getElementById('btn-delete-selected').innerText = "⏳ BORRANDO...";
+            for (const id of selectedBooksIds) {
+                await deleteDoc(doc(db, "libros", id));
+            }
+            alert(`✅ Se eliminaron ${selectedBooksIds.length} libros correctamente.`);
+            selectedBooksIds = [];
+            toggleMultiSelectMode(); 
+        } catch(e) {
+            alert("Error al borrar masivamente: " + e.message);
+        } finally {
+            document.getElementById('btn-delete-selected').innerText = "🗑️ ELIMINAR SELECCIONADOS";
+        }
+    };
+
+    window.openEditModal = function(collectionName, id) {
+        if(event) event.stopPropagation();
+        let item;
+                if (collectionName === 'libros') {
+            item = cloudBooks.find(b => b.id === id);
+            document.getElementById('edit-title-input').value = (item && item.title !== undefined) ? item.title : "";
+            document.getElementById('edit-desc-input').value = (item && item.author !== undefined) ? item.author : ""; 
+            document.getElementById('edit-link-input').value = (item && item.pdfLink !== undefined) ? item.pdfLink : "";
+            document.getElementById('edit-img-input').value = (item && item.cover !== undefined) ? item.cover : "";
+
+        } else {
+
+            item = youtubeVideos.find(v => v.id === id);
+            document.getElementById('edit-title-input').value = item.title || "";
+            document.getElementById('edit-desc-input').value = item.desc || ""; 
+            document.getElementById('edit-link-input').value = item.url || "";
+            document.getElementById('edit-img-input').value = ""; 
+        }
+        if(item) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-collection').value = collectionName;
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+    };
+
+    window.saveEdit = async function() {
+        const id = document.getElementById('edit-id').value;
+        const colName = document.getElementById('edit-collection').value;
+        const updateData = { title: document.getElementById('edit-title-input').value };
+        if(colName === 'libros') {
+            updateData.author = document.getElementById('edit-desc-input').value;
+            updateData.pdfLink = document.getElementById('edit-link-input').value;
+            updateData.cover = document.getElementById('edit-img-input').value;
+        } else {
+            updateData.desc = document.getElementById('edit-desc-input').value;
+            updateData.url = document.getElementById('edit-link-input').value;
+        }
+        try { await updateDoc(doc(db, colName, id), updateData); document.getElementById('edit-modal').style.display = 'none'; showModal("¡Corregido!", "Cambios guardados."); } catch(e) { alert("Error: " + e.message); }
+    };
+
+    /* --- 6. RENDERIZADO VISUAL --- */
+    window.toggleDrawer = function() { 
+        const d = document.getElementById('drawer');
+        d.classList.toggle('open'); 
+        document.getElementById('overlay').style.display = d.classList.contains('open') ? 'block' : 'none'; 
+    };
+
+    window.navigate = function(id) {
+        document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(id).classList.add('active');
+        
+        const btnMap = {'recientes':0, 'nube':1, 'versiculo':2, 'videos':3, 'debate':4};
+        const tabs = document.querySelectorAll('.nav-tabs button');
+        if(btnMap[id] !== undefined) tabs[btnMap[id]].classList.add('active');
+        
+        refreshActiveViews();
+        
+        if(id === 'videos') {
+            startRain(); 
+            updateVideoUploadUI();
+        } else {
+            stopRain();
+        }
+
+        if(id === 'debate') {
+            startUserCounter(); 
+        } else {
+            stopUserCounter();
+        }
+
+        if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
+    }
+
+    function startUserCounter() {
+        const el = document.getElementById('live-user-count');
+        if(!el) return;
+        el.innerText = Math.floor(Math.random() * (12 - 4 + 1) + 4);
+        if(robotInterval) clearInterval(robotInterval);
+        robotInterval = setInterval(() => {
+            const count = Math.floor(Math.random() * (15 - 4 + 1) + 4);
+            el.innerText = count;
+        }, 5000); 
+    }
+    
+    function stopUserCounter() {
+        if(robotInterval) clearInterval(robotInterval);
+    }
+
+                let allSearchBooks = [];
+    let isSearchLoaded = false;
+
+    window.searchBooks = async function(q) {
+        const t = q.toLowerCase();
+        
+        // Si borras el texto, vuelve a la vista normal de 100 libros
+        if (t === '') {
+            renderLibrary('grid-recientes', cloudBooks);
+            renderLibrary('grid-nube', cloudBooks);
+            updateLoadMoreButton();
+            return;
+        }
+
+        // Descarga el catálogo completo de fondo solo la primera vez que buscas
+        if (!isSearchLoaded) {
+            const c = document.getElementById('grid-recientes');
+            if(c) c.innerHTML = '<div class="loading-container"><div class="spinner"></div><span style="font-size:11px;">Buscando en toda la biblioteca...</span></div>';
+            const snap = await getDocs(collection(db, "libros"));
+            allSearchBooks = [];
+            snap.forEach(doc => allSearchBooks.push({ id: doc.id, ...doc.data(), type: 'cloud' }));
+            isSearchLoaded = true;
+        }
+
+        const fBooks = allSearchBooks.filter(b => {
+            const tieneTitulo = b.title ? b.title.toLowerCase().includes(t) : false;
+            const tieneAutor = b.author ? b.author.toLowerCase().includes(t) : false;
+            return tieneTitulo || tieneAutor;
+        });
+
+        renderLibrary('grid-recientes', fBooks);
+        renderLibrary('grid-nube', fBooks);
+        
+        // Oculta el botón de cargar más mientras buscas
+        const btn = document.getElementById('btn-load-more');
+        const info = document.getElementById('load-more-info');
+        if(btn) btn.style.display = 'none';
+        if(info) info.innerText = `Resultados globales: ${fBooks.length}`;
+
+        if(document.getElementById('videos').classList.contains('active')) {
+            renderVideoList(youtubeVideos.filter(v => v.title ? v.title.toLowerCase().includes(t) : false));
+        }
+    };
+
+
+    window.changeTheme = function(name, element) { 
+        document.body.className = name !== 'default' ? 'theme-'+name : ''; 
+        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+        if(element) element.classList.add('active');
+    };
+
+        function renderLibrary(id, books) {
+        const c = document.getElementById(id); c.innerHTML = '';
+
+        if(isLoading) {
+            c.innerHTML = '<div class="loading-container"><div class="spinner"></div><span>Conectando con la nube...</span></div>';
+            return;
+        }
+
+        if(!books.length) { c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#777">Vacío</p>'; return; }
+
+        const appendAd = () => {
+            const adDiv = document.createElement('div');
+            adDiv.style.gridColumn = '1 / -1';
+            adDiv.style.display = 'flex';
+            adDiv.style.justifyContent = 'center';
+            adDiv.style.margin = '15px 0 25px 0';
+            adDiv.style.width = '100%';
+            
+            const innerBox = document.createElement('div');
+            innerBox.style.background = 'rgba(0,0,0,0.2)';
+            innerBox.style.padding = '10px';
+            innerBox.style.border = '1px solid var(--ui-border)';
+            innerBox.style.borderRadius = '8px';
+            innerBox.style.display = 'flex';
+            innerBox.style.flexDirection = 'column';
+            innerBox.style.alignItems = 'center';
+            innerBox.style.justifyContent = 'center';
+            innerBox.style.overflow = 'hidden';
+            innerBox.style.minWidth = '320px';
+            
+            const label = document.createElement('span');
+            label.style.fontSize = '9px';
+            label.style.color = 'var(--text-muted)';
+            label.style.marginBottom = '5px';
+            label.style.textTransform = 'uppercase';
+            label.innerText = 'Publicidad';
+            innerBox.appendChild(label);
+
+            const adFrame = document.createElement('iframe');
+            adFrame.width = "320";
+            adFrame.height = "50";
+            adFrame.frameBorder = "0";
+            adFrame.scrolling = "no";
+            adFrame.style.display = "block";
+            adFrame.style.margin = "0 auto";
+            adFrame.sandbox = "allow-scripts allow-same-origin allow-popups";
+
+            // Se usa <\/script> para evitar romper el string en JS
+            adFrame.srcdoc = `<html><body style="margin:0;padding:0;display:flex;justify-content:center;align-items:center;background:transparent;"><script type="text/javascript">atOptions = { 'key' : 'c36b83d57d4eb29929181a189550bb31', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };<\/script><script type="text/javascript" src="https://www.highperformanceformat.com/c36b83d57d4eb29929181a189550bb31/invoke.js"><\/script></body></html>`;
+            innerBox.appendChild(adFrame);
+
+            adDiv.appendChild(innerBox);
+            c.appendChild(adDiv);
+        };
+
+        // 1. PUBLICIDAD AL INICIO DE TODO
+        appendAd();
+
+        let shelfIndex = 0;
+        for(let i=0; i<books.length; i+=3) {
+            books.slice(i, i+3).forEach(b => {
+                const isFav = favorites.some(f => f.title === b.title) ? 'active' : '';
+                const div = document.createElement('div'); div.className = 'book-wrapper';
+                
+                let coverHtml = b.cover ? `<img src="${b.cover}" class="book-cover" onerror="this.onerror=null;this.parentNode.innerHTML='<div class=\\'book-cover generated\\'><span>${b.title}</span></div>'">` : `<div class="book-cover generated" style="background:linear-gradient(135deg,${stringToColor(b.title)},#222)"><span>${b.title}</span></div>`;
+
+                let adminBtns = '';
+                                if (isAdminMode && b.type === 'cloud') {
+                    let checkboxHtml = '';
+                    if (isMultiSelectMode) {
+                        const isChecked = selectedBooksIds.includes(b.id) ? 'checked' : '';
+                        checkboxHtml = `<input type="checkbox" value="${b.id}" ${isChecked} onchange="toggleBookSelection('${b.id}', this.checked)" style="width:25px; height:25px; position:absolute; top:-15px; left:-15px; z-index:70; cursor:pointer; accent-color:#ffea00; box-shadow:0 0 10px rgba(0,0,0,0.8);">`;
+                    }
+                    adminBtns = `<div class="admin-controls">
+                        <div class="icon-btn edit-btn" onclick="openEditModal('libros', '${b.id}')">✏️</div>
+                        <div class="icon-btn delete-btn" onclick="deleteItem('libros', '${b.id}')">🗑️</div>
+                    </div>${checkboxHtml}`;
+                }
+
+                
+                div.innerHTML = `<div class="book-title">${b.title}</div>${adminBtns}<svg class="fav-heart ${isFav}" width="20" height="20" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>${coverHtml}`;
+                                div.querySelector('.fav-heart').onclick = (e) => { e.stopPropagation(); toggleFav(b, e.target.closest('.fav-heart')); };
+                                               div.onclick = () => {
+                    const btnRead = document.getElementById('btn-read-pdf');
+                    const btnDownload = document.getElementById('btn-download-pdf');
+                    
+                    if(btnRead) {
+                        btnRead.onclick = () => {
+                            document.getElementById('pdf-confirm-modal').style.display='none';
+                            window.open(b.pdfLink, '_blank');
+                        };
+                    }
+                    
+                      if(btnDownload) {
+                        btnDownload.onclick = () => {
+                            document.getElementById('pdf-confirm-modal').style.display='none';
+                            
+                            const ads = [
+                                "https://www.effectivegatecpm.com/bju7faig6?key=d4c087ca3524b4bee6f6c8bd9e5c8d9e",
+                                "https://ukuleqasforsalesre.com?tid=1248841",
+                                "https://omg10.com/4/10744381"
+                            ];
+                            window.open(ads[Math.floor(Math.random() * ads.length)], '_blank');
+                            
+                            let counter = 5;
+                            document.getElementById('modal-title').innerText = "⏳ Preparando Descarga";
+                            document.getElementById('modal-msg').innerText = "INSTRUCCIONES:\n1. Se ha abierto una publicidad.\n2. Cierra la publicidad o regresa a esta pantalla.\n3. Tu libro se abrirá en " + counter + " segundos.";
+                            document.getElementById('success-modal').style.display = 'flex';
+                            
+                            const interval = setInterval(() => {
+                                counter--;
+                                if(counter > 0) {
+                                    document.getElementById('modal-msg').innerText = "INSTRUCCIONES:\n1. Se ha abierto una publicidad.\n2. Cierra la publicidad o regresa a esta pantalla.\n3. Tu libro se abrirá en " + counter + " segundos.";
+                                } else {
+                                    clearInterval(interval);
+                                    document.getElementById('success-modal').style.display = 'none';
+                                    window.open(b.pdfLink, '_blank'); 
+                                }
+                            }, 1000);
+                        };
+                    }
+                  
+                    document.getElementById('pdf-confirm-modal').style.display='flex';
+                };
+
+                c.appendChild(div);
+            });
+            const s = document.createElement('div'); s.className = 'shelf-wood'; c.appendChild(s);
+
+            shelfIndex++;
+            // 2. PUBLICIDAD CADA 3 ESTANTES
+            if (shelfIndex % 3 === 0) {
+                appendAd();
+            }
+        }
+    }
+
+
+    function getYoutubeId(url) {
+        if(!url) return null;
+        const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+    
+    function renderVideoList(list = youtubeVideos) {
+        const c = document.getElementById('video-list'); c.innerHTML = '';
+        if(!list.length) { c.innerHTML = '<p style="text-align:center;color:#777">No hay videos</p>'; return; }
+        
+        list.forEach(v => {
+            const vid = getYoutubeId(v.url);
+            const thumb = vid ? `https://img.youtube.com/vi/${vid}/hqdefault.jpg` : 'https://via.placeholder.com/480x360?text=Video';
+            const card = document.createElement('div'); card.className = 'video-card';
+            
+            let adminBtns = '';
+            if(isAdminMode) {
+                adminBtns = `<div style="display:flex; border-top:1px solid #444; margin-top:auto;">
+                    <button onclick="openEditModal('videos', '${v.id}')" style="flex:1; background:#ffea00; color:black; border:none; padding:10px; cursor:pointer; font-weight:bold;">✏️ EDITAR</button>
+                    <button onclick="deleteItem('videos', '${v.id}')" style="flex:1; background:#ff1744; color:white; border:none; padding:10px; cursor:pointer; font-weight:bold;">🗑️ BORRAR</button>
+                </div>`;
+            }
+
+            let uploaderHtml = '';
+            let avatarDisplay = v.uploaderAvatar || '👤';
+            let nameDisplay = v.uploaderName || 'Anónimo';
+            let badge = '';
+
+            if(nameDisplay === 'ADMINISTRADOR') {
+                avatarDisplay = '🛡️';
+                badge = '<span class="admin-badge">ADMIN</span>';
+            }
+
+            if(v.uploaderName) {
+                uploaderHtml = `
+                    <div style="display:flex; align-items:center; gap:8px; padding:0 15px 10px 15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div style="width:20px; height:20px; border-radius:50%; background:#444; font-size:12px; display:flex; align-items:center; justify-content:center;">${avatarDisplay}</div>
+                        <span style="font-size:11px; color:var(--text-muted);">${nameDisplay} ${badge}</span>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <img src="${thumb}" class="video-thumb" onclick="window.open('${v.url}', '_blank')">
+                <div class="video-info">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-desc">${v.desc||''}</div>
+                </div>
+                ${uploaderHtml}
+                ${adminBtns}
+            `;
+            c.appendChild(card);
+        });
+    }
+
+    // UTILS
+    window.handleGenericForm = function(e, t, m) { if(e.target.action) return; e.preventDefault(); showModal(t, m); e.target.reset(); };
+        window.toggleUploadUI = function() {
+        const type = document.getElementById('uploadType').value;
+        const manualCont = document.getElementById('manualLinksContainer');
+        const fileCont = document.getElementById('fileUploadContainer');
+        const btnCloudinary = document.getElementById('btnCloudinary');
+        const btnDropbox = document.getElementById('btnDropboxFile');
+        const fileStatus = document.getElementById('fileStatus');
+        
+        fileStatus.innerText = "";
+        
+                const btnDrive = document.getElementById('btnDriveFile');
+        if (type === 'link') {
+            manualCont.style.display = 'block';
+            fileCont.style.display = 'none';
+        } else if (type === 'cloudinary') {
+            manualCont.style.display = 'none';
+            fileCont.style.display = 'block';
+            btnCloudinary.style.display = 'inline-block';
+            btnDropbox.style.display = 'none';
+            if(btnDrive) btnDrive.style.display = 'none';
+        } else if (type === 'dropbox') {
+            manualCont.style.display = 'none';
+            fileCont.style.display = 'block';
+            btnCloudinary.style.display = 'none';
+            btnDropbox.style.display = 'inline-block';
+            if(btnDrive) btnDrive.style.display = 'none';
+        } else if (type === 'drive') {
+            manualCont.style.display = 'none';
+            fileCont.style.display = 'block';
+            btnCloudinary.style.display = 'none';
+            btnDropbox.style.display = 'none';
+            if(btnDrive) btnDrive.style.display = 'inline-block';
+        }
+
+    };
+    window.openCloudinaryWidget = function() {
+                        cloudinary.openUploadWidget({
+            cloudName: 'dcg9ihpvr',
+            uploadPreset: 'Biblioteca',
+
+            sources: ['local', 'url'],
+            multiple: false,
+            clientAllowedFormats: ['pdf', 'epub']
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                const secureUrl = result.info.secure_url;
+                document.getElementById('pubLink').value = secureUrl;
+                if(secureUrl.endsWith('.pdf')) {
+                    document.getElementById('pubCover').value = secureUrl.replace('.pdf', '.jpg');
+                } else {
+                    document.getElementById('pubCover').value = "";
+                }
+                document.getElementById('fileStatus').innerText = "✅ Archivo subido a Cloudinary listo para publicar.";
+            } else if (error) {
+                console.error("Error Cloudinary:", error);
+            }
+        });
+    };
+       window.openCloudinaryWidgetForCover = function(targetInputId) {
+                cloudinary.openUploadWidget({
+            cloudName: 'dcg9ihpvr',
+            uploadPreset: 'Biblioteca',
+            sources: ['local', 'url'],
+
+            multiple: false,
+            clientAllowedFormats: ['png', 'jpg', 'jpeg', 'webp', 'gif']
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                document.getElementById(targetInputId).value = result.info.secure_url;
+            } else if (error) {
+                console.error("Error Cloudinary Portada:", error);
+            }
+        });
+    };
+ document.getElementById('fileSelector').addEventListener('change', function(e) {
+        if(e.target.files.length > 0) {
+            document.getElementById('fileStatus').innerText = "📄 Archivo seleccionado: " + e.target.files[0].name;
+        }
+    });
+
+                window.uploadToDropbox = async function(file) {
+        const TOKEN = globalDropboxToken || prompt("Pega tu Token de Dropbox:");
+        if (!TOKEN) throw new Error("Operación cancelada. Token vacío.");
+
+        const path = "/Biblioteca/" + Date.now() + "_" + file.name.replace(/\s+/g, '_');
+
+        
+        const uploadResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + TOKEN,
+                'Dropbox-API-Arg': JSON.stringify({
+                    "autorename": false,
+                    "mode": "add",
+                    "mute": false,
+                    "path": path,
+                    "strict_conflict": false
+                }),
+                'Content-Type': 'application/octet-stream'
+            },
+            body: file
+        });
+        
+        if (!uploadResponse.ok) throw new Error("Error al subir archivo a Dropbox.");
+        
+        const linkResponse = await fetch('https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "path": path })
+        });
+        
+        if (!linkResponse.ok) throw new Error("Error al generar enlace en Dropbox.");
+        
+        const linkData = await linkResponse.json();
+        return linkData.url.replace('dl=0', 'raw=1');
+    };
+        window.importFromDropbox = async function() {
+        const TOKEN = prompt("Pega tu Token de Dropbox para Importación Masiva:");
+        if (!TOKEN) return;
+        try {
+            const listResponse = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ "path": "/Biblioteca" })
+            });
+            if (!listResponse.ok) throw new Error("Error al listar archivos. Revisa tu Token.");
+            const listData = await listResponse.json();
+            
+            const validFiles = listData.entries.filter(file => file['.tag'] === 'file' && (file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.epub')));
+            const total = validFiles.length;
+            if(total === 0) return alert("No hay archivos PDF o ePub válidos.");
+
+            const progressContainer = document.getElementById('massive-progress-container');
+            const progressBar = document.getElementById('massive-progress-bar');
+            const progressText = document.getElementById('massive-progress-text');
+            progressContainer.style.display = 'block';
+            
+            let procesados = 0;
+            for (let i = 0; i < total; i++) {
+                const file = validFiles[i];
+                progressText.innerText = `Importando ${i + 1} de ${total}...`;
+                progressBar.style.width = `${((i + 1) / total) * 100}%`;
+
+                const linkResponse = await fetch('https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "path": file.path_lower })
+                });
+                
+                let sharedUrl = "";
+                if (linkResponse.ok) {
+                    const linkData = await linkResponse.json();
+                    sharedUrl = linkData.url.replace('dl=0', 'raw=1');
+                } else {
+                    console.warn("Link ya existente o error para", file.name);
+                    continue; 
+                }
+                
+                const title = file.name.replace('.pdf', '').replace('.epub', '').replace(/_/g, ' ');
+                await addDoc(collection(db, "libros"), {
+                    title: title, author: "Dropbox Import", pdfLink: sharedUrl, cover: "", timestamp: serverTimestamp()
+                });
+                procesados++;
+            }
+            progressContainer.style.display = 'none';
+            alert(`📥 Importación masiva completada. Se añadieron ${procesados} libros.`);
+        } catch(e) {
+            document.getElementById('massive-progress-container').style.display = 'none';
+            alert("Error en importación masiva: " + e.message);
+        }
+    };
+
+
+    window.showModal = function(t, m) { document.getElementById('modal-title').innerText=t; document.getElementById('modal-msg').innerText=m; document.getElementById('success-modal').style.display='flex'; };
+    window.closeModal = function() { document.getElementById('success-modal').style.display='none'; };
+    
+        window.uploadBookToCloud = async function() {
+        const type = document.getElementById('uploadType').value;
+                const t = document.getElementById('pubTitle').value;
+                const a = document.getElementById('pubAuthor').value;
+        let l = document.getElementById('pubLink').value;
+
+        let c = document.getElementById('pubCover').value;
+
+        
+        const btn = document.getElementById('btnFinalPublish');
+        
+        if(!t || !a) return alert("Faltan el título o el autor");
+                const isDuplicate = cloudBooks.some(b => b.title.toLowerCase().trim() === t.toLowerCase().trim());
+        if (isDuplicate) {
+            return alert("⛔ Error: Ya existe un libro con este título exacto en la base de datos pública.");
+        }
+
+                btn.innerText = "⏳ Procesando..."; 
+        btn.disabled = true;
+        document.getElementById('single-upload-progress').style.display = 'block';
+
+
+                if (type === 'dropbox') {
+            const fileInput = document.getElementById('fileSelector');
+            if (fileInput.files.length === 0) {
+                btn.innerText = "PUBLICAR AHORA"; btn.disabled = false;
+                return alert("Selecciona un archivo para subir a Dropbox.");
+            }
+            try {
+                l = await uploadToDropbox(fileInput.files[0]);
+                c = ""; 
+            } catch (err) {
+                btn.innerText = "PUBLICAR AHORA"; btn.disabled = false;
+                return alert(err.message);
+            }
+        } else if (type === 'cloudinary' && !l) {
+            btn.innerText = "PUBLICAR AHORA"; btn.disabled = false;
+            return alert("Primero debes subir el archivo usando el botón de Cloudinary.");
+        } else if (type === 'drive' && !l) {
+            btn.innerText = "PUBLICAR AHORA"; btn.disabled = false;
+            return alert("Primero debes seleccionar el archivo usando el botón de Google Drive.");
+        } else if (type === 'link' && !l) {
+            btn.innerText = "PUBLICAR AHORA"; btn.disabled = false;
+            return alert("Falta ingresar el Link del PDF.");
+        }
+
+
+                    try { 
+            await addDoc(collection(db, "libros"), { title:t, author:a, pdfLink:l, cover:c, timestamp: serverTimestamp() }); 
+
+            showModal("Listo", "El libro está disponible para todos."); 
+     
+            document.getElementById('publishForm').reset(); 
+            document.getElementById('fileStatus').innerText = "";
+            if (typeof toggleUploadUI === 'function') toggleUploadUI();
+            window.navigate('recientes'); 
+        } 
+        catch(e){alert("Error al guardar: " + e.message);} 
+                finally { btn.innerText = "PUBLICAR AHORA"; btn.disabled = false; document.getElementById('single-upload-progress').style.display = 'none'; }
+
+    };
+
+
+    window.updateDailyVerse = async function() {
+        try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Versículo actualizado."); } catch(e){alert(e.message);}
+    };
+    window.deleteDailyVerse = async function() { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "configuracion", "versiculo_diario")); };
+        window.scanAndRemoveDuplicates = async function() {
+        if(!confirm("🕵️ ADMIN: ¿Quieres escanear y eliminar los libros repetidos en la base de datos (dejando solo uno de cada título)? Esta acción no se puede deshacer.")) return;
+        
+        const titlesSeen = {};
+        const duplicatesIds = [];
+
+        cloudBooks.forEach(b => {
+            const cleanTitle = b.title.toLowerCase().trim();
+            if (titlesSeen[cleanTitle]) {
+                duplicatesIds.push(b.id);
+            } else {
+                titlesSeen[cleanTitle] = true;
+            }
+        });
+
+        if (duplicatesIds.length === 0) {
+            return alert("✅ Todo limpio. No se encontraron libros duplicados.");
+        }
+
+        if(!confirm(`⚠️ Se detectaron ${duplicatesIds.length} libros duplicados. ¿Proceder a eliminarlos?`)) return;
+
+        try {
+            for (const id of duplicatesIds) {
+                await deleteDoc(doc(db, "libros", id));
+            }
+            alert(`✅ Limpieza completada. Se eliminaron ${duplicatesIds.length} libros duplicados.`);
+        } catch(e) {
+            alert("Error al limpiar duplicados: " + e.message);
+        }
+    };
+
+    function renderVerse(d) {
+        if(!d) { document.getElementById('displayVerseTitle').innerText=""; document.getElementById('displayVerseText').innerText="Esperando..."; document.getElementById('displayVerseImg').style.display='none'; return; }
+        document.getElementById('displayVerseTitle').innerText=d.title; document.getElementById('displayVerseText').innerText=`"${d.text}"`; document.getElementById('verseDate').innerText=d.date;
+        const img=document.getElementById('displayVerseImg'); if(d.image){img.src=d.image; img.style.display='block';}else{img.style.display='none';}
+    }
+    
+    function startFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); const c=document.getElementById('versiculo-container'); leavesInterval=setInterval(()=>{if(c.querySelectorAll('.leaf').length>15)return; const l=document.createElement('div');l.className='leaf';l.style.left=Math.random()*90+"%";l.style.animationDuration=(Math.random()*3+4)+"s";l.onanimationend=()=>l.remove();c.appendChild(l);},800); }
+    function stopFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); document.querySelectorAll('.leaf').forEach(e=>e.remove()); }
+    function startRain() { if(rainInterval) clearInterval(rainInterval); const c=document.getElementById('videos'); rainInterval=setInterval(()=>{if(c.querySelectorAll('.rain').length>40)return; const r=document.createElement('div');r.className='rain';r.style.left=Math.random()*100+"%";r.style.animationDuration=(Math.random()*0.5+0.5)+"s";r.onanimationend=()=>r.remove();c.appendChild(r);},100); }
+    function stopRain() { if(rainInterval) clearInterval(rainInterval); document.querySelectorAll('.rain').forEach(e=>e.remove()); }
+
+    function stringToColor(str) { let hash=0; for(let i=0;i<str.length;i++) hash=str.charCodeAt(i)+((hash<<5)-hash); let c='#'; for(let i=0;i<3;i++) c+=('00'+((hash>>(i*8))&0xFF).toString(16)).substr(-2); return c; }
+    function toggleFav(b, el) { const idx=favorites.findIndex(f=>f.title===b.title); if(idx===-1){favorites.push(b);if(el)el.classList.add('active');}else{favorites.splice(idx,1);if(el)el.classList.remove('active');if(document.getElementById('favoritos').classList.contains('active'))renderLibrary('grid-favoritos',favorites);} localStorage.setItem('my_fav_books',JSON.stringify(favorites)); }
+    
+    /* ================================================================= */
+    /* === 8. LÓGICA AVANZADA: AUTH, PERFIL Y MURO SOCIAL === */
+    /* ================================================================= */
+
+    window.loginWithGoogle = async () => {
+        try { 
+            const provider = new GoogleAuthProvider(); 
+            provider.setCustomParameters({ prompt: 'select_account' });
+            await signInWithRedirect(auth, provider); 
+        } catch(e) { 
+            alert("Error login: " + e.message); 
+        }
+    };
+
+    window.logout = () => {
+        signOut(auth);
+        window.location.reload(); 
+    };
+
+        onAuthStateChanged(auth, async (user) => {
+        window.currentUser = user; 
+        
+        if (user) {
+            if (user.isAnonymous) {
+                updateUserUI();
+            } else {
+                const userRef = doc(db, "usuarios", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    window.currentUserProfile = userSnap.data();
+                    if(window.currentUserProfile.status === 'bloqueado') {
+                        alert("🚫 TU CUENTA HA SIDO BLOQUEADA POR EL ADMINISTRADOR.");
+                    }
+                    updateUserUI();
+                } else {
+                    document.getElementById('profile-nick').value = user.displayName; 
+                    document.getElementById('profile-setup-modal').style.display = 'flex';
+                }
+            }
+        } else {
+            signInAnonymously(auth).catch((error) => console.error("Error Auth Anónima:", error));
+            updateUserUI();
+        }
+
+        updateVideoUploadUI();
+        initSocialFeed();
+    });
+
+
+    function updateUserUI() {
+        const loginPrompt = document.getElementById('feed-login-prompt');
+        const createPostCard = document.getElementById('create-post-container');
+
+        const canPost = isAdminMode || (window.currentUser && window.currentUserProfile);
+
+        if (canPost) {
+            loginPrompt.style.display = 'none';
+            createPostCard.style.display = 'block';
+
+            if (isAdminMode && !window.currentUserProfile) {
+                document.getElementById('user-name-display').innerText = "ADMINISTRADOR";
+                document.getElementById('user-avatar-display').innerText = "🛡️";
+            } else if (window.currentUserProfile) {
+                document.getElementById('user-name-display').innerText = window.currentUserProfile.nickname;
+                document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
+            }
+        } else {
+            loginPrompt.style.display = 'block';
+            createPostCard.style.display = 'none';
+        }
+        
+        updateVideoUploadUI();
+    }
+
+    window.selectAvatar = (emoji, el) => {
+        document.querySelectorAll('.avatar-option').forEach(d => d.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('selected-avatar-val').value = emoji;
+    };
+
+    window.toggleSaveBtn = () => {
+        const chk = document.getElementById('terms-check');
+        const btn = document.getElementById('btn-save-profile');
+        btn.disabled = !chk.checked;
+        if(chk.checked) btn.style.opacity = "1"; else btn.style.opacity = "0.5";
+    };
+
+    window.showTerms = () => {
+        document.getElementById('terms-modal').style.display = 'flex';
+    };
+
+    window.saveUserProfile = async () => {
+        const nick = document.getElementById('profile-nick').value.trim();
+        const avatar = document.getElementById('selected-avatar-val').value;
+        const terms = document.getElementById('terms-check').checked;
+
+        if(!nick || !avatar) return alert("Por favor elige un Nickname y un Avatar.");
+        if(!terms) return alert("Debes aceptar los Términos y Condiciones.");
+
+        const userData = {
+            uid: window.currentUser.uid,
+            nickname: nick,
+            avatar: avatar,
+            email: window.currentUser.email,
+            status: 'activo', 
+            createdAt: serverTimestamp()
+        };
+
+        try {
+            await setDoc(doc(db, "usuarios", window.currentUser.uid), userData);
+            window.currentUserProfile = userData; 
+            document.getElementById('profile-setup-modal').style.display = 'none';
+            updateUserUI();
+            showModal("¡Bienvenido!", "Perfil creado con éxito.");
+        } catch(e) {
+            alert("Error al guardar perfil: " + e.message);
+        }
+    };
+
+    /* --- B. LÓGICA HÍBRIDA DE VIDEOS (ADMIN vs USER) --- */
+    
+    window.updateVideoUploadUI = function() {
+        const btnContainer = document.getElementById('btn-show-video-form');
+        if (!btnContainer) return;
+        if (isAdminMode || window.currentUserProfile) {
+            btnContainer.style.display = 'block';
+        } else {
+            btnContainer.style.display = 'none';
+        }
+    };
+
+    window.toggleVideoForm = function() {
+        if (!isAdminMode && !window.currentUserProfile) {
+            return alert("Para subir videos debes iniciar sesión.");
+        }
+        if (window.currentUserProfile && window.currentUserProfile.status === 'bloqueado') {
+            return alert("🚫 Tu cuenta está bloqueada.");
+        }
+        const form = document.getElementById('video-upload-form');
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    };
+
+    window.uploadVideo = async function() {
+        const t = document.getElementById('vidTitle').value;
+        const d = document.getElementById('vidDesc').value;
+        const u = document.getElementById('vidUrl').value;
+        
+        if(!t || !u) return alert("Faltan datos");
+
+        let uploaderName, uploaderAvatar, uploaderUid;
+
+        if (isAdminMode) {
+            uploaderName = "ADMINISTRADOR";
+            uploaderAvatar = "🛡️"; 
+            uploaderUid = "admin_system";
+        } else if (window.currentUserProfile) {
+            if(window.currentUserProfile.status === 'bloqueado') return alert("Bloqueado");
+            uploaderName = window.currentUserProfile.nickname;
+            uploaderAvatar = window.currentUserProfile.avatar;
+            uploaderUid = window.currentUser.uid;
+        } else {
+            return alert("Error de permisos.");
+        }
+
+        try { 
+            await addDoc(collection(db, "videos"), { 
+                title: t, desc: d, url: u, 
+                timestamp: serverTimestamp(),
+                uploaderUid: uploaderUid,
+                uploaderName: uploaderName,
+                uploaderAvatar: uploaderAvatar
+            }); 
+            showModal("Listo", "Video compartido con la comunidad."); 
+            document.getElementById('video-upload-form').style.display = 'none'; 
+            document.getElementById('vidTitle').value = '';
+            document.getElementById('vidDesc').value = '';
+            document.getElementById('vidUrl').value = '';
+        } catch(e){
+            alert(e.message);
+        }
+    };
+
+    /* --- C. MURO SOCIAL (FEED) --- */
+    let unsubscribeFeed = null;
+
+    function initSocialFeed() {
+        if(unsubscribeFeed) unsubscribeFeed();
+        const container = document.getElementById('feed-container');
+        if(!container) return;
+
+        const q = query(collection(db, "publicaciones"), orderBy("timestamp", "desc"), limit(50));
+        
+        unsubscribeFeed = onSnapshot(q, (snapshot) => {
+            container.innerHTML = ''; 
+            if (snapshot.empty) {
+                container.innerHTML = `<p style="text-align:center; color:#777; margin-top:20px">No hay publicaciones aún.</p>`;
+                return;
+            }
+
+            snapshot.forEach(docSnap => {
+                const post = docSnap.data();
+                const pid = docSnap.id;
+                
+                const likes = post.likes || [];
+                const disagrees = post.disagrees || [];
+                const userLiked = window.currentUser && likes.includes(window.currentUser.uid);
+                const userDisagreed = window.currentUser && disagrees.includes(window.currentUser.uid);
+
+                let adminControls = '';
+                if (isAdminMode) {
+                    adminControls = `
+                        <button class="post-del-btn" onclick="deletePost('${pid}')">🗑️</button>
+                        <button class="ban-btn" onclick="banUser('${post.authorUid}', '${post.authorName}')">🚫 BAN</button>
+                    `;
+                }
+
+                let badge = '';
+                if(post.authorName === 'ADMINISTRADOR') {
+                    badge = '<span class="admin-badge">ADMIN</span>';
+                }
+                
+                const card = document.createElement('div');
+                card.className = 'social-card';
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${post.authorAvatar || '?'}</div>
+                        <div class="post-meta">
+                            <span class="post-author">
+                                ${post.authorName || 'Anónimo'} ${badge}
+                                ${adminControls}
+                            </span>
+                            <span class="post-date">${post.dateStr || ''}</span>
+                        </div>
+                    </div>
+                    <div class="post-title">${post.title || ''}</div>
+                    <div class="post-body">${post.text || ''}</div>
+                    
+                    <div class="social-actions">
+                        <button class="action-btn ${userLiked ? 'liked' : ''}" onclick="interactPost('${pid}', 'like')">
+                            👍 ${likes.length || 0}
+                        </button>
+                        <button class="action-btn ${userDisagreed ? 'disagreed' : ''}" onclick="interactPost('${pid}', 'disagree')">
+                            👎 ${disagrees.length || 0}
+                        </button>
+                        <button class="action-btn" onclick="toggleComments('${pid}')">
+                            💬 Comentar
+                        </button>
+                    </div>
+
+                    <div id="comments-${pid}" class="comments-section">
+                        <div id="comments-list-${pid}"></div>
+                        ${(window.currentUser || isAdminMode) ? `
+                            <form onsubmit="postComment(event, '${pid}')" style="display:flex; gap:5px; margin-top:10px;">
+                                <input type="text" id="input-comment-${pid}" class="input-box" placeholder="Escribe un comentario..." style="margin:0; padding:8px; font-size:12px;">
+                                <button type="submit" style="background:var(--accent); border:none; border-radius:4px; color:#000; font-weight:bold; cursor:pointer;">➤</button>
+                            </form>
+                        ` : `<p style="font-size:10px; color:#777; margin-top:5px">Regístrate para comentar.</p>`}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    }
+
+    /* --- D. ACCIONES SOCIALES --- */
+    
+    window.createPost = async () => {
+        let title = document.getElementById('postTitle').value.trim();
+        let text = document.getElementById('postBody').value.trim();
+        if(!title || !text) return alert("Escribe algo.");
+
+        let pName, pAvatar, pUid;
+
+        if (isAdminMode) {
+            pName = "ADMINISTRADOR";
+            pAvatar = "🛡️";
+            pUid = "admin_system";
+        } 
+        else {
+            if(!window.currentUserProfile) return alert("Error de perfil.");
+            if(window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
+            pName = window.currentUserProfile.nickname;
+            pAvatar = window.currentUserProfile.avatar;
+            pUid = window.currentUser.uid;
+        }
+
+        try {
+            await addDoc(collection(db, "publicaciones"), {
+                title: title, text: text,
+                authorName: pName,
+                authorAvatar: pAvatar,
+                authorUid: pUid,
+                timestamp: serverTimestamp(),
+                dateStr: new Date().toLocaleDateString(),
+                likes: [], disagrees: []
+            });
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postBody').value = '';
+            showModal("Publicado", "Tu tema está en el muro.");
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
+    window.interactPost = async (pid, type) => {
+        if(!window.currentUser) return alert("Regístrate para participar.");
+        if(window.currentUserProfile && window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
+        const uid = window.currentUser.uid;
+        const ref = doc(db, "publicaciones", pid);
+        try {
+            if(type === 'like') await updateDoc(ref, { likes: arrayUnion(uid), disagrees: arrayRemove(uid) });
+            else await updateDoc(ref, { disagrees: arrayUnion(uid), likes: arrayRemove(uid) });
+        } catch(e) { console.error(e); }
+    };
+
+    /* --- E. SISTEMA DE BANEO Y BORRADO (ADMIN) --- */
+    window.deletePost = async (pid) => {
+        if(!confirm("ADMIN: ¿Borrar post?")) return;
+        try { await deleteDoc(doc(db, "publicaciones", pid)); } catch(e) { alert(e.message); }
+    };
+
+    window.banUser = async (targetUid, targetName) => {
+        if(targetUid === 'admin_system') return alert("No puedes banear al admin.");
+        if(!confirm(`ADMIN: ¿BLOQUEAR a ${targetName}?\nNo podrá publicar nada más.`)) return;
+        try {
+            await updateDoc(doc(db, "usuarios", targetUid), { status: 'bloqueado' });
+            alert(`🚫 Usuario ${targetName} bloqueado.`);
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
+    /* --- F. COMENTARIOS --- */
+    window.toggleComments = (pid) => {
+        const sec = document.getElementById(`comments-${pid}`);
+        if(sec.style.display === 'none' || sec.style.display === '') {
+            sec.style.display = 'block';
+            loadComments(pid);
+        } else {
+            sec.style.display = 'none';
+        }
+    };
+
+    function loadComments(pid) {
+        const listDiv = document.getElementById(`comments-list-${pid}`);
+        onSnapshot(query(collection(db, "publicaciones", pid, "comentarios"), orderBy("timestamp", "asc")), (snap) => {
+            listDiv.innerHTML = '';
+            snap.forEach(d => {
+                const c = d.data();
+                let adminBtns = '';
+                if(isAdminMode) {
+                    adminBtns = `<span onclick="deleteComment('${pid}', '${d.id}')" style="color:red; cursor:pointer; font-size:10px; margin-left:5px;">[x]</span>`;
+                }
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `
+                    <div class="comment-header">
+                        <span class="comment-author">${c.authorAvatar || ''} ${c.authorName} ${adminBtns}</span>
+                        <span style="color:#555; font-size:9px">${c.dateStr}</span>
+                    </div>
+                    <div class="comment-text">${c.text}</div>
+                `;
+                listDiv.appendChild(item);
+            });
+        });
+    }
+
+    window.postComment = async (e, pid) => {
+        e.preventDefault();
+        const input = document.getElementById(`input-comment-${pid}`);
+        const text = input.value.trim();
+        if(!text) return;
+
+        let cName, cAvatar, cUid;
+
+        if (isAdminMode) {
+            cName = "ADMINISTRADOR";
+            cAvatar = "🛡️";
+            cUid = "admin_system";
+        } else {
+            if(!window.currentUserProfile) return alert("Regístrate para comentar.");
+            if(window.currentUserProfile.status === 'bloqueado') return alert("🚫 Bloqueado.");
+            cName = window.currentUserProfile.nickname;
+            cAvatar = window.currentUserProfile.avatar;
+            cUid = window.currentUser.uid;
+        }
+
+        try {
+            await addDoc(collection(db, "publicaciones", pid, "comentarios"), {
+                text: text,
+                authorName: cName,
+                authorAvatar: cAvatar,
+                authorUid: cUid,
+                timestamp: serverTimestamp(),
+                dateStr: new Date().toLocaleDateString()
+            });
+            input.value = '';
+        } catch(err) { alert("Error al comentar"); }
+    };
+
+    window.deleteComment = async (pid, cid) => {
+        if(!confirm("ADMIN: ¿Borrar comentario?")) return;
+        await deleteDoc(doc(db, "publicaciones", pid, "comentarios", cid));
+    };
+
+    /* --- G. NOTAS PERSONALES --- */
+    const localNotes = localStorage.getItem('my_personal_notes');
+    if(localNotes) document.getElementById('user-notes').value = localNotes;
+    window.saveNotes = () => {
+        localStorage.setItem('my_personal_notes', document.getElementById('user-notes').value);
+        document.getElementById('notes-modal').style.display = 'none';
+        showModal("Notas Guardadas", "Tus notas están seguras.");
+    };
+
+    /* --- DETECTOR DE INTERNET (NUEVO) --- */
+    function updateOnlineStatus() {
+        const banner = document.getElementById('offline-indicator');
+        if(navigator.onLine) {
+            banner.style.display = 'none';
+        } else {
+            banner.style.display = 'flex';
+        }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus(); // Chequeo inicial
+            /* --- I. GOOGLE DRIVE PICKER API --- */
+    let pickerApiLoaded = false;
+    let oauthToken = null;
+
+            window.gapiLoaded = function() {
+        pickerApiLoaded = true;
+        gapi.load('picker', {'callback': () => { pickerApiLoaded = true; }});
+    };
+    setTimeout(() => { 
+        if (typeof gapi !== 'undefined' && !pickerApiLoaded) window.gapiLoaded(); 
+    }, 1500);
+
+
+
+    window.handleDriveAuthClick = function() {
+        if (!globalDriveClientId) return alert("Falta el Client ID de Drive en la Bóveda.");
+        if (!pickerApiLoaded) return alert("Cargando API de Drive, intenta de nuevo en un segundo.");
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: globalDriveClientId,
+            scope: 'https://www.googleapis.com/auth/drive.readonly',
+            callback: (response) => {
+                if (response.error) {
+                    console.error("Error Auth Drive:", response);
+                    return;
+                }
+                oauthToken = response.access_token;
+                createPicker();
+            }
+        });
+        tokenClient.requestAccessToken();
+    };
+
+    function createPicker() {
+        const view = new google.picker.View(google.picker.ViewId.DOCS);
+        view.setMimeTypes("application/pdf,application/epub+zip");
+        const picker = new google.picker.PickerBuilder()
+            .addView(view)
+            .setOAuthToken(oauthToken)
+            .setDeveloperKey(globalDriveApiKey)
+            .setAppId(globalDriveAppId)
+            .setCallback(pickerCallback)
+            .build();
+        picker.setVisible(true);
+    }
+
+    function pickerCallback(data) {
+
+        if (data.action === google.picker.Action.PICKED) {
+            const doc = data.docs[0];
+            document.getElementById('pubLink').value = doc.url;
+            document.getElementById('pubCover').value = ""; // Vaciamos portada para autogenerar
+            document.getElementById('fileStatus').innerText = "✅ Seleccionado de Drive: " + doc.name;
+        }
+    }
+    window.importFromDrive = async function() {
+        if (!globalDriveClientId || !globalDriveApiKey) return alert("Faltan credenciales de Drive en la Bóveda.");
+        
+        const folderId = prompt("Ingresa el ID de la carpeta de Google Drive:");
+        if (!folderId) return;
+
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: globalDriveClientId,
+            scope: 'https://www.googleapis.com/auth/drive.readonly',
+            callback: async (response) => {
+                if (response.error) {
+                    console.error("Error Auth Drive:", response);
+                    return alert("Error al autenticar con Google Drive.");
+                }
+                const token = response.access_token;
+                
+                try {
+                                        const res = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&pageSize=1000&fields=files(name,webViewLink)&key=${globalDriveApiKey}`, {
+
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (!res.ok) throw new Error("Error al listar archivos. Verifica el ID de la carpeta o los permisos.");
+                    const data = await res.json();
+                    
+                    if (!data.files || data.files.length === 0) {
+                        return alert("No se encontraron archivos en esta carpeta.");
+                    }
+
+                                        const validFiles = data.files.filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.epub'));
+                    const total = validFiles.length;
+                    if(total === 0) return alert("No se encontraron archivos PDF o ePub válidos.");
+
+                    const progressContainer = document.getElementById('massive-progress-container');
+                    const progressBar = document.getElementById('massive-progress-bar');
+                    const progressText = document.getElementById('massive-progress-text');
+                    progressContainer.style.display = 'block';
+
+                    let procesados = 0;
+                    for (let i = 0; i < total; i++) {
+                        const file = validFiles[i];
+                        progressText.innerText = `Importando ${i + 1} de ${total}...`;
+                        progressBar.style.width = `${((i + 1) / total) * 100}%`;
+
+                        const title = file.name.replace('.pdf', '').replace('.epub', '').replace(/_/g, ' ');
+                        await addDoc(collection(db, "libros"), {
+                            title: title, author: "Drive Import", pdfLink: file.webViewLink, cover: "", timestamp: serverTimestamp()
+                        });
+                        procesados++;
+                    }
+                    progressContainer.style.display = 'none';
+                    alert(`📥 Importación masiva de Drive completada. Se añadieron ${procesados} libros.`);
+
+                } catch (err) {
+                    alert("Error en importación de Drive: " + err.message);
+                }
+            }
+        });
+        tokenClient.requestAccessToken();
+    };
+
+    /* --- H. INICIO --- */
+    navigate('recientes');
+    if(isAdminMode) {
+        toggleAdminForms(true);
+        updateUserUI(); 
+    }
+
+</script>
+<script async defer src="https://apis.google.com/js/api.js"></script>
+
+<script async defer src="https://accounts.google.com/gsi/client"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
+        });
+    }
+</script>
+
+</body>
+</html>
+
