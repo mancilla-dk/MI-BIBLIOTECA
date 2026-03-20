@@ -1027,14 +1027,22 @@
     const db = getFirestore(app);
     const auth = getAuth(app); 
 
-    /* --- 1.1 MANEJO RETORNO LOGIN (MÓVILES) --- */
-    getRedirectResult(auth)
-        .then((result) => {
-            if (result) console.log("Regreso de Google exitoso.");
-        })
-        .catch((error) => {
-            if (error.code !== 'auth/popup-closed-by-user') console.error("Error Login:", error);
-        });
+       /* --- 1.1 MANEJO RETORNO LOGIN (MÓVILES) --- */
+    getRedirectResult(auth).then(async (result) => {
+        if (result && result.user) {
+            const user = result.user;
+            const userSnap = await getDoc(doc(db, "usuarios", user.uid));
+            if (!userSnap.exists()) {
+                document.getElementById('profile-nick').value = user.displayName || ''; 
+                const emailField = document.getElementById('profile-email-display');
+                if(emailField) emailField.value = user.email || 'Sin correo público';
+                document.getElementById('profile-setup-modal').style.display = 'flex';
+            }
+        }
+    }).catch((error) => {
+        console.error("Error Login:", error);
+    });
+
 
     /* --- 2. ESTADO GLOBAL --- */
     let cloudBooks = []; 
@@ -2103,18 +2111,17 @@
     /* ================================================================= */
     /* === 8. LÓGICA AVANZADA: AUTH, PERFIL Y MURO SOCIAL === */
     /* ================================================================= */
-
     window.loginWithGoogle = async () => {
         try { 
+            document.getElementById('welcome-modal').style.display = 'none';
+            document.getElementById('auth-login-modal').style.display = 'none';
             const provider = new GoogleAuthProvider(); 
-            provider.setCustomParameters({ prompt: 'select_account' });
-            await signInWithPopup(auth, provider); 
+            await signInWithRedirect(auth, provider); 
         } catch(e) { 
-            if (e.code !== 'auth/popup-closed-by-user') {
-                alert("Error login: " + e.message); 
-            }
+            alert("Error login: " + e.message); 
         }
     };
+    
            
     window.logout = () => {
         signOut(auth);
