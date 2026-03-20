@@ -361,16 +361,16 @@
         }
         @keyframes fallRain { to { transform: translateY(100vh); } }
 
-        .verse-card-display {
+               .verse-card-display {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-            padding: 30px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-top: 40px; z-index: 10;
-            max-width: 90%; width: 100%; box-sizing: border-box;
+            padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); margin-top: 20px; z-index: 10;
+            width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px;
         }
-        .verse-img {
-            width: 100%; border-radius: 10px; margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); object-fit: cover;
+        @media (min-width: 600px) {
+            .verse-card-display { flex-direction: row; align-items: center; text-align: left; }
         }
+
 
         /* MODALS (GENERAL) */
         .modal-overlay {
@@ -452,9 +452,13 @@
 </div>
 
 <div id="profile-setup-modal" class="modal-overlay">
-    <div class="modal-content">
+        <div class="modal-content">
+        <div style="position:relative;">
+            <button onclick="document.getElementById('profile-setup-modal').style.display='none'" style="position:absolute; right:-10px; top:-10px; background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✖</button>
+        </div>
         <div style="font-size:40px; margin-bottom:10px">👋</div>
         <h3 style="color:var(--accent); margin:0 0 5px 0;">¡Bienvenido/a!</h3>
+
         <p style="color:var(--text-main); font-size:13px; margin-bottom:20px;">Configura tu perfil para la comunidad.</p>
         
         <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">TU APODO / NICKNAME</label>
@@ -475,7 +479,8 @@
             <span>Acepto los <span class="terms-link" onclick="showTerms()">Términos y Condiciones</span> de la comunidad.</span>
         </div>
 
-        <button id="btn-save-profile" class="btn-neon" onclick="saveUserProfile()" disabled>GUARDAR Y CONTINUAR</button>
+              <button id="btn-save-profile" class="btn-neon" onclick="saveUserProfile()" disabled>GUARDAR Y CONTINUAR</button>
+        <button onclick="logout()" class="btn-neon" style="margin-top:15px; border-color:#ff1744; color:#ff1744; background:rgba(255,23,68,0.1);">CERRAR SESIÓN</button>
     </div>
 </div>
 
@@ -503,22 +508,87 @@
         </div>
     </div>
 </div>
-<div id="admin-login-modal" class="modal-overlay" style="z-index:10002;">
+<div id="auth-login-modal" class="modal-overlay" style="z-index:10002;">
     <div class="modal-content">
-        <h3 style="color:var(--accent); margin-top:0;">🛡️ Acceso Admin</h3>
-        <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Inicia sesión con tu cuenta de administrador.</p>
-        <input type="email" id="admin-email" class="input-box" placeholder="Correo electrónico" style="margin-bottom:10px; padding:10px;">
+        <h3 style="color:var(--accent); margin-top:0;">👤 Iniciar Sesión</h3>
+        <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Únete a la comunidad o accede como administrador.</p>
+        
+        <button class="btn-google" onclick="loginWithGoogle()" style="margin:0 auto 20px auto; width:100%;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+            Registrarse / Entrar con Google
+        </button>
+        
+        <div style="border-top:1px solid rgba(255,255,255,0.1); margin:15px 0; position:relative;">
+            <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#222; padding:0 10px; font-size:10px; color:#666; white-space:nowrap;">O ACCESO ADMIN</span>
+        </div>
+        
+        <input type="email" id="admin-email" class="input-box" placeholder="Correo electrónico" style="margin-top:20px; margin-bottom:10px; padding:10px;">
         <input type="password" id="admin-pass" class="input-box" placeholder="Contraseña" style="margin-bottom:20px; padding:10px;">
+        
         <div style="display:flex; gap:10px; justify-content:center;">
-            <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="document.getElementById('admin-login-modal').style.display='none'">CANCELAR</button>
+            <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="document.getElementById('auth-login-modal').style.display='none'">CANCELAR</button>
             <button class="btn-neon" style="font-size:11px; padding:8px;" onclick="loginAdmin()">ENTRAR</button>
         </div>
+    </div>
+</div>
+
+
+<div id="admin-panel-modal" class="modal-overlay" style="z-index:10003;">
+
+    <div class="modal-content" style="max-height:80vh; overflow-y:auto; padding:20px;">
+        <div style="position:relative;">
+            <button onclick="document.getElementById('admin-panel-modal').style.display='none'" style="position:absolute; right:-10px; top:-10px; background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✖</button>
+        </div>
+               <h2 style="color:var(--accent); margin-top:0;">🛡️ Panel Admin</h2>
+                <div style="background:rgba(213,0,249,0.1); border:1px solid #d500f9; border-radius:8px; padding:10px; margin-bottom:15px; text-align:center;">
+            <span style="font-size:12px; color:var(--text-main);">📈 Total Usuarios Registrados:</span><br>
+            <span id="admin-total-users" style="font-size:18px; font-weight:bold; color:#d500f9;">Calculando...</span>
+        </div>
+
+        
+        <div id="admin-api-vault" style="display:none; margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; text-align:center;">
+
+            <h3 style="color:var(--accent); margin-bottom:10px;">🔐 Bóveda de APIs</h3>
+            <input type="password" id="vaultDropbox" class="input-box" placeholder="Token de Dropbox" style="margin-bottom:5px;">
+            <input type="password" id="vaultDriveClient" class="input-box" placeholder="Client ID Drive" style="margin-bottom:5px;">
+            <input type="password" id="vaultDriveApi" class="input-box" placeholder="API Key Drive" style="margin-bottom:5px;">
+            <input type="password" id="vaultDriveApp" class="input-box" placeholder="App ID Drive" style="margin-bottom:15px;">
+            <button type="button" class="btn-neon" onclick="const t = document.getElementById('vaultDropbox').type === 'password' ? 'text' : 'password'; document.getElementById('vaultDropbox').type = t; document.getElementById('vaultDriveClient').type = t; document.getElementById('vaultDriveApi').type = t; document.getElementById('vaultDriveApp').type = t;" style="margin-bottom:10px; border-color:#888; color:#aaa;">👁️ MOSTRAR/OCULTAR</button>
+            <button class="btn-neon" onclick="saveApiKeys()" style="margin-bottom:10px;">GUARDAR CLAVES</button>
+            <button class="btn-neon" onclick="importFromDrive()" style="background:rgba(0,230,118,0.2); border-color:#00e676; color:#00e676;">📥 IMPORTACIÓN DRIVE</button>
+            <button class="btn-neon" onclick="toggleMultiSelectMode()" style="background:rgba(255,234,0,0.2); border-color:#ffea00; color:#ffea00; margin-top:10px;">☑️ MODO SELECCIÓN</button>
+            <button id="btn-delete-selected" class="btn-neon" onclick="deleteSelectedBooks()" style="display:none; background:rgba(255,23,68,0.2); border-color:#ff1744; color:#ff1744; margin-top:10px;">🗑️ ELIMINAR SELECCIONADOS</button>
+            <button class="btn-neon" onclick="scanAndRemoveDuplicates()" style="background:rgba(213,0,249,0.2); border-color:#d500f9; color:#d500f9; margin-top:10px;">🕵️ ESCANEAR DUPLICADOS</button>
+        </div>
+
+        <button id="btn-admin-dropbox" onclick="importFromDropbox()" style="display:none; background:rgba(0,100,255,0.2); border:1px solid #0064ff; padding:5px 15px; border-radius:15px; color:#0064ff; font-size:10px; cursor:pointer; margin-top:10px; width:100%;">📥 IMPORTACIÓN DROPBOX</button>
+
+        <div id="admin-update-form" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+            <h3 style="color:var(--accent); text-align:center; margin-bottom:5px;">🔔 Configurar Alerta</h3>
+            <label style="font-size:10px; color:var(--accent);">ESTADO DEL AVISO</label>
+            <select id="updStatus" class="input-box" style="padding:10px; height:auto; margin-bottom:10px; background:#111;">
+                <option value="off">🔴 Desactivado</option>
+                <option value="on">🟢 Activado</option>
+            </select>
+            <label style="font-size:10px; color:var(--accent);">VERSIÓN DE LA NUEVA APP</label>
+            <input type="text" id="updVersionInput" class="input-box" placeholder="Ej: 2.0" style="margin-bottom:10px;">
+            <label style="font-size:10px; color:var(--accent);">TÍTULO DE LA VENTANA</label>
+            <input type="text" id="updTitleInput" class="input-box" placeholder="Ej: ¡Nueva Versión!">
+            <label style="font-size:10px; color:var(--accent);">MENSAJE / TEXTO</label>
+            <textarea id="updMsgInput" class="input-box" rows="2" placeholder="Ej: Descarga..."></textarea>
+            <label style="font-size:10px; color:var(--accent);">LINK DE DESCARGA</label>
+            <input type="text" id="updLinkInput" class="input-box" placeholder="https://...">
+            <button class="btn-neon" onclick="saveUpdateConfig()">GUARDAR ALERTA</button>
+        </div>
+
+               <button onclick="logout()" class="btn-neon" style="margin-top:20px; border-color:#ff1744; color:#ff1744; background:rgba(255,23,68,0.1);">CERRAR SESIÓN</button>
     </div>
 </div>
 
 <div id="success-modal" class="modal-overlay">
     <div class="modal-content">
         <div style="font-size:40px; margin-bottom:10px">✨</div>
+
         <h3 id="modal-title" style="color:var(--text-main); margin:0 0 10px 0;">¡Éxito!</h3>
         <p id="modal-msg" style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Operación realizada.</p>
         <button class="btn-neon" onclick="closeModal()">CERRAR</button>
@@ -565,12 +635,22 @@
 </div>
 
 <div id="drawer" class="drawer">
-    <div class="drawer-header">
+        <div class="drawer-header" style="padding-bottom:15px;">
         <h2 style="margin:0; color:var(--accent); text-shadow:0 0 10px var(--accent-glow)">Mi Biblioteca</h2>
-        <small style="color:var(--text-muted)">La verdad de Dios, al alcance de todos</small>
+        <small style="color:var(--text-muted); display:block; margin-bottom:15px;">La verdad de Dios, al alcance de todos</small>
+        
+        <div id="drawer-user-profile" onclick="handleProfileClick()" style="display:flex; align-items:center; gap:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:10px; cursor:pointer; border:1px solid rgba(255,255,255,0.1); transition:0.3s;">
+            <div id="drawer-avatar" style="width:35px; height:35px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:18px;">👤</div>
+            <div style="flex:1; text-align:left;">
+                <div id="drawer-username" style="font-size:13px; font-weight:bold; color:var(--text-main);">Iniciar Sesión</div>
+                <div id="drawer-user-desc" style="font-size:10px; color:var(--text-muted);">Toca para conectarte</div>
+            </div>
+        </div>
     </div>
     <div style="flex:1; overflow-y:auto">
         <div class="drawer-item" onclick="navigate('recientes'); toggleDrawer()"><svg class="icon"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Inicio</div>
+
+
         <div class="drawer-item" onclick="navigate('configuracion'); toggleDrawer()"><svg class="icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Personalización</div>
         <div class="drawer-item" onclick="navigate('publicar'); toggleDrawer()"><svg class="icon"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg> Publicar</div>
         <div class="drawer-item" onclick="navigate('donacion'); toggleDrawer()"><svg class="icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Donación</div>
@@ -582,10 +662,12 @@
     <div class="header-top">
         <div class="menu-btn" onclick="toggleDrawer()" style="color:var(--text-main); font-size:24px; cursor:pointer; margin-right:10px;">☰</div>
         
-        <div class="search-box">
+                <div class="search-box">
             <span style="color:#777">🔍</span> 
             <input type="text" id="searchInput" placeholder="Buscar libro..." onkeyup="searchBooks(this.value)">
+            <span id="total-books-counter" style="font-size:11px; color:var(--accent); font-weight:bold; white-space:nowrap; margin-left:8px;">Calculando...</span>
         </div>
+
 
         <button class="notes-header-btn" onclick="document.getElementById('notes-modal').style.display='flex'">
             📝 Notas
@@ -604,6 +686,7 @@
 <main id="main-content">
 
     <div id="recientes" class="page-section active">
+       
                 <div style="padding: 10px 10px 0 10px;">
             <button class="intro-note-btn" style="border-color:#ffcc00; color:#ffcc00; flex-direction: column; text-align: center; padding: 15px;" onclick="const ads=['https://www.effectivegatecpm.com/bju7faig6?key=d4c087ca3524b4bee6f6c8bd9e5c8d9e','https://ukuleqasforsalesre.com?tid=1248841','https://omg10.com/4/10744381']; window.open(ads[Math.floor(Math.random()*ads.length)], '_blank'); alert('¡Gracias por apoyar la app! Estás ayudando a mantener los servidores activos.');">
                 <span style="font-size: 15px;">🤝 Apoya esta app y sus servidores</span>
@@ -627,19 +710,20 @@
         <div id="versiculo-container">
             <div id="admin-verse-form" style="display:none; width:100%; margin-bottom:20px; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px;">
                 <h4 style="margin:0 0 10px 0; color:var(--accent)">Admin: Versículo Diario</h4>
-                <input type="text" id="verseTitle" class="input-box" placeholder="Título (ej: La Paz)" style="margin-bottom:5px">
-                <textarea id="verseText" class="input-box" rows="3" placeholder="Texto o descripción del versículo..." style="margin-bottom:5px"></textarea>
-                <input type="url" id="verseImgUrl" class="input-box" placeholder="URL de la imagen" style="margin-bottom:5px">
+                                <input type="text" id="verseTitle" class="input-box" placeholder="Título (ej: La Paz)" style="margin-bottom:8px">
+                <textarea id="verseText" class="input-box" rows="3" placeholder="Texto o descripción del versículo..." style="margin-bottom:10px"></textarea>
+                
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
+                    <button type="button" class="btn-neon" style="background:rgba(0, 229, 255, 0.1);" onclick="openCloudinaryWidgetForCover('verseImgUrl')">🖼️ SUBIR IMAGEN (RECOMENDADO)</button>
+                    <input type="url" id="verseImgUrl" class="input-box" placeholder="O pega el Link de la imagen aquí..." style="margin:0; font-size:11px; padding:10px;">
+                </div>
+                
                 <button class="btn-neon" onclick="updateDailyVerse()">PUBLICAR</button>
-                <button class="btn-neon" onclick="deleteDailyVerse()" style="margin-top:10px; background:red; border-color:red; color:white;">ELIMINAR VERSÍCULO</button>
+
             </div>
 
-            <div class="verse-card-display">
-                <img id="displayVerseImg" class="verse-img" src="" style="display:none">
-                <h2 id="displayVerseTitle" style="color:var(--accent); margin-top:0;"></h2>
-                <p id="displayVerseText" style="color:#fff; font-family:'Georgia', serif; font-style:italic; font-size:16px; line-height:1.5;"></p>
-                <p id="verseDate" style="color:var(--text-muted); font-size:12px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px"></p>
-            </div>
+            <div id="versiculos-list" style="width:100%; max-width:800px; display:flex; flex-direction:column; gap:20px; z-index:10; margin-top:10px; padding-bottom:80px;"></div>
+
         </div>
     </div>
 
@@ -673,8 +757,15 @@
                 </div>
                 
                 <input type="text" id="postTitle" class="input-box" placeholder="Título de tu tema..." style="margin-bottom:8px; padding:10px;">
-                <textarea id="postBody" class="input-box" rows="3" placeholder="Comparte una reflexión o pregunta..." style="margin-bottom:10px; padding:10px;"></textarea>
+                                               <textarea id="postBody" class="input-box" rows="3" placeholder="Comparte una reflexión o pregunta..." style="margin-bottom:10px; padding:10px;"></textarea>
+                
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
+                    <button type="button" class="btn-neon" style="background:rgba(0, 229, 255, 0.1);" onclick="openCloudinaryWidgetForCover('postImgUrl')">🖼️ SUBIR IMAGEN (OPCIONAL)</button>
+                    <input type="url" id="postImgUrl" class="input-box" placeholder="O pega el Link de la imagen aquí..." style="margin:0; font-size:11px; padding:10px;">
+                </div>
+                
                 <button class="btn-neon" onclick="createPost()">PUBLICAR</button>
+
             </div>
 
             <div id="feed-container" class="social-feed">
@@ -715,45 +806,7 @@
                 <div class="theme-card" onclick="changeTheme('purple', this)"><div class="theme-preview-circle" style="background:#12051a; border-color:#d500f9;"></div><div class="theme-name">Deep Purple</div></div>
                 <div class="theme-card" onclick="changeTheme('gold', this)"><div class="theme-preview-circle" style="background:#141005; border-color:#ffca28;"></div><div class="theme-name">Luxury Gold</div></div>
             </div>
-            
-            <div style="text-align:center; margin-top:20px;">
-                <button onclick="toggleAdminMode()" style="background:none; border:1px solid #444; padding:5px 15px; border-radius:15px; color:var(--text-muted); font-size:10px; cursor:pointer;">Admin Mode</button>
-            </div>
-                        <div id="admin-api-vault" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; text-align:center;">
-                <h3 style="color:var(--accent); margin-bottom:10px;">🔐 Bóveda de APIs</h3>
-                <input type="password" id="vaultDropbox" class="input-box" placeholder="Token de Dropbox" style="margin-bottom:5px;">
-                <input type="password" id="vaultDriveClient" class="input-box" placeholder="Client ID Drive" style="margin-bottom:5px;">
-                <input type="password" id="vaultDriveApi" class="input-box" placeholder="API Key Drive" style="margin-bottom:5px;">
-                                <input type="password" id="vaultDriveApp" class="input-box" placeholder="App ID Drive" style="margin-bottom:15px;">
-                <button type="button" class="btn-neon" onclick="const t = document.getElementById('vaultDropbox').type === 'password' ? 'text' : 'password'; document.getElementById('vaultDropbox').type = t; document.getElementById('vaultDriveClient').type = t; document.getElementById('vaultDriveApi').type = t; document.getElementById('vaultDriveApp').type = t;" style="margin-bottom:10px; border-color:#888; color:#aaa;">👁️ MOSTRAR/OCULTAR CLAVES</button>
-                <button class="btn-neon" onclick="saveApiKeys()" style="margin-bottom:10px;">GUARDAR CLAVES</button>
-
-                <button class="btn-neon" onclick="importFromDrive()" style="background:rgba(0,230,118,0.2); border-color:#00e676; color:#00e676;">📥 IMPORTACIÓN MASIVA DRIVE</button>
-                                <button class="btn-neon" onclick="toggleMultiSelectMode()" style="background:rgba(255,234,0,0.2); border-color:#ffea00; color:#ffea00; margin-top:10px;">☑️ MODO SELECCIÓN MÚLTIPLE</button>
-                <button id="btn-delete-selected" class="btn-neon" onclick="deleteSelectedBooks()" style="display:none; background:rgba(255,23,68,0.2); border-color:#ff1744; color:#ff1744; margin-top:10px;">🗑️ ELIMINAR SELECCIONADOS</button>
-                <button class="btn-neon" onclick="scanAndRemoveDuplicates()" style="background:rgba(213,0,249,0.2); border-color:#d500f9; color:#d500f9; margin-top:10px;">🕵️ ESCANEAR DUPLICADOS</button>
-
-            </div>
-
-<button id="btn-admin-dropbox" onclick="importFromDropbox()" style="display:none; background:rgba(0,100,255,0.2); border:1px solid #0064ff; padding:5px 15px; border-radius:15px; color:#0064ff; font-size:10px; cursor:pointer; margin-left:10px;">📥 IMPORTACIÓN MASIVA DROPBOX</button>
-            <div id="admin-update-form" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
-                <h3 style="color:var(--accent); text-align:center; margin-bottom:5px;">🔔 Configurar Alerta</h3>
-                                <label style="font-size:10px; color:var(--accent);">ESTADO DEL AVISO</label>
-                <select id="updStatus" class="input-box" style="padding:10px; height:auto; margin-bottom:10px; background:#111;">
-                    <option value="off">🔴 Desactivado</option>
-                    <option value="on">🟢 Activado (Visible al entrar)</option>
-                </select>
-                <label style="font-size:10px; color:var(--accent);">VERSIÓN DE LA NUEVA APP</label>
-                <input type="text" id="updVersionInput" class="input-box" placeholder="Ej: 2.0 (Solo se mostrará si la versión es distinta)" style="margin-bottom:10px;">
-                <label style="font-size:10px; color:var(--accent);">TÍTULO DE LA VENTANA</label>
-
-                <input type="text" id="updTitleInput" class="input-box" placeholder="Ej: ¡Nueva Versión Disponible!">
-                <label style="font-size:10px; color:var(--accent);">MENSAJE / TEXTO</label>
-                <textarea id="updMsgInput" class="input-box" rows="2" placeholder="Ej: Descarga la nueva..."></textarea>
-                <label style="font-size:10px; color:var(--accent);">LINK DE DESCARGA</label>
-                <input type="text" id="updLinkInput" class="input-box" placeholder="https://...">
-                <button class="btn-neon" onclick="saveUpdateConfig()">GUARDAR CONFIGURACIÓN</button>
-            </div>
+                       
         </div>
     </div>
 
@@ -763,10 +816,10 @@
             <p style="font-size:11px; color:var(--text-muted); margin-bottom:15px">Agrega un libro a la base de datos pública.</p>
                        <form id="publishForm" onsubmit="handleGenericForm(event, '¡Publicado!', 'El libro está disponible para todos.')">
                 <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">MÉTODO DE SUBIDA</label>
-                                <select id="uploadType" class="input-box" onchange="toggleUploadUI()">
+                                               <select id="uploadType" class="input-box" onchange="toggleUploadUI()">
+                    <option value="dropbox">Dropbox (Subir PDF/EPUB)</option>
                     <option value="link">Tengo un Link</option>
                     <option value="cloudinary">Cloudinary</option>
-                    <option value="dropbox">Dropbox</option>
                     <option value="drive">Google Drive</option>
                 </select>
 
@@ -777,7 +830,7 @@
                 <input type="text" id="pubAuthor" class="input-box" required placeholder="Nombre del Autor">
                               
 
-                                <div id="manualLinksContainer">
+                                <div id="manualLinksContainer" style="display:none;">
                     <label style="font-size:11px; font-weight:bold; color:var(--text-muted)">LINK PDF (Google Drive/Dropbox)</label>
                     <input type="url" id="pubLink" class="input-box" placeholder="https://...">
                 </div>
@@ -789,13 +842,14 @@
                 </div>
 
 
-                <div id="fileUploadContainer" style="display:none; text-align:center; margin-bottom:15px;">
+                <div id="fileUploadContainer" style="display:block; text-align:center; margin-bottom:15px;">
                     <input type="file" id="fileSelector" style="display:none" accept=".pdf,.epub">
                     <button type="button" id="btnCloudinary" class="btn-neon" style="display:none;" onclick="openCloudinaryWidget()">☁️ SUBIR A CLOUDINARY</button>
-                    <button type="button" id="btnDropboxFile" class="btn-neon" style="display:none;" onclick="document.getElementById('fileSelector').click()">📦 SELECCIONAR ARCHIVO</button>
+                    <button type="button" id="btnDropboxFile" class="btn-neon" style="display:inline-block;" onclick="document.getElementById('fileSelector').click()">📦 SELECCIONAR ARCHIVO</button>
                     <button type="button" id="btnDriveFile" class="btn-neon" style="display:none;" onclick="handleDriveAuthClick()">📁 SELECCIONAR DE DRIVE</button>
                     <p id="fileStatus" style="font-size:11px; color:var(--accent); margin-top:10px;"></p>
                 </div>
+
 
                 <button type="button" id="btnFinalPublish" class="btn-neon filled" onclick="uploadBookToCloud()">PUBLICAR AHORA</button>
                                 <div id="single-upload-progress" style="display:none; width:100%; background:rgba(255,255,255,0.1); border-radius:10px; height:8px; margin-top:15px; overflow:hidden;">
@@ -1021,10 +1075,14 @@
     async function loadInitialBooks() {
         isLoading = true;
         const coll = collection(db, "libros");
-        try {
+                try {
             const countSnap = await getCountFromServer(coll);
             window.totalBooksCount = countSnap.data().count;
+                       const counterEl = document.getElementById('total-books-counter');
+            if(counterEl) counterEl.innerText = window.totalBooksCount + " Libros";
+
         } catch(e) { window.totalBooksCount = 100; }
+
         
         onSnapshot(query(coll, orderBy("timestamp", "desc"), limit(100)), (snapshot) => {
             cloudBooks = [];
@@ -1084,9 +1142,29 @@
         refreshActiveViews();
     });
 
-    // Versículo
-    onSnapshot(doc(db, "configuracion", "versiculo_diario"), (docSnap) => {
-        renderVerse(docSnap.exists() ? docSnap.data() : null);
+        // Versículos Múltiples
+    onSnapshot(query(collection(db, "versiculos"), orderBy("timestamp", "desc"), limit(50)), (snapshot) => {
+        const c = document.getElementById('versiculos-list');
+        if (!c) return;
+        c.innerHTML = '';
+        if (snapshot.empty) { c.innerHTML = '<p style="color:#777;">No hay versículos publicados.</p>'; return; }
+        snapshot.forEach(docSnap => {
+            const d = docSnap.data();
+            const id = docSnap.id;
+            let adminBtn = isAdminMode ? `<button class="btn-neon" style="margin-top:10px; background:rgba(255,23,68,0.2); border-color:#ff1744; color:#ff1744; padding:5px 10px; font-size:10px;" onclick="deleteDailyVerse('${id}')">🗑️ ELIMINAR</button>` : '';
+            const imgHtml = d.image ? `<img src="${d.image}" style="width:100%; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.5); object-fit:cover; max-height: 350px;">` : '';
+            
+            c.innerHTML += `
+            <div class="verse-card-display">
+                ${imgHtml ? `<div style="flex:1;">${imgHtml}</div>` : ''}
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                    <h2 style="color:var(--accent); margin-top:0;">${d.title}</h2>
+                    <p style="color:#fff; font-family:'Georgia', serif; font-style:italic; font-size:16px; line-height:1.5;">"${d.text}"</p>
+                    <p style="color:var(--text-muted); font-size:12px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px">${d.date || ''}</p>
+                    ${adminBtn}
+                </div>
+            </div>`;
+        });
     });
 
        // Configuración Alerta (ACTUALIZACIONES)
@@ -1121,8 +1199,69 @@
         if(document.getElementById('favoritos').classList.contains('active')) renderLibrary('grid-favoritos', favorites);
         toggleAdminForms(isAdminMode);
     }
+        window.currentNotifBook = null;
+    window.closeAppNotification = function() {
+        const el = document.getElementById('app-notification');
+        el.style.top = '-100px';
+        setTimeout(() => { el.style.display = 'none'; }, 500);
+        if(window.currentNotifBook && window.currentNotifBook.pdfLink) {
+            window.open(window.currentNotifBook.pdfLink, '_blank');
+        }
+    };
+       function showAppNotification(title, desc, bookObj, fallbackIcon) {
+        const el = document.getElementById('app-notification');
+        window.currentNotifBook = bookObj;
+        document.getElementById('notif-title').innerText = title;
+        document.getElementById('notif-desc').innerText = desc;
+        
+        const iconEl = document.getElementById('notif-icon');
+        if (bookObj && bookObj.cover && bookObj.cover.trim() !== '') {
+            iconEl.innerHTML = '<img src="' + bookObj.cover + '" style="width:100%; height:100%; object-fit:cover;">';
+        } else {
+            iconEl.innerHTML = fallbackIcon;
+        }
+
+        el.style.display = 'block';
+        setTimeout(() => { el.style.top = '20px'; }, 100);
+        setTimeout(() => {
+            el.style.top = '-100px';
+            setTimeout(() => { el.style.display = 'none'; }, 500);
+        }, 5000);
+    }
+
+        function startNotificationLoop() {
+        let step = 0;
+        setInterval(() => {
+            if (!cloudBooks || cloudBooks.length === 0) return;
+            
+            if (step === 0) {
+                const newBook = cloudBooks[0]; 
+                showAppNotification("Recién Subido 📥", newBook.title, newBook, "📖");
+            } else if (step === 1) {
+                const popBook = cloudBooks[Math.floor(Math.random() * cloudBooks.length)]; 
+                showAppNotification("Libro más leído 🔥", popBook.title, popBook, "📖");
+            } else if (step === 2) {
+                const randomBook = cloudBooks[Math.floor(Math.random() * cloudBooks.length)];
+                showAppNotification("Libro Recomendado 🌟", randomBook.title, randomBook, "📖");
+            } else if (step === 3) {
+                const count = document.getElementById('live-user-count') ? document.getElementById('live-user-count').innerText : Math.floor(Math.random() * (15 - 4 + 1) + 4);
+                showAppNotification("Comunidad Activa 👥", `${count} usuarios activos leyendo en este momento`, null, "👥");
+            }
+            step = (step + 1) % 4; // Reinicia el ciclo (ahora son 4 notificaciones)
+        }, 39000); // 39 segundos exactos de espera entre uno y otro
+        
+        // Notificación de 10 segundos inicial para mostrar los usuarios activos
+        setTimeout(() => {
+            startUserCounter(); // Aseguramos que se genere el número
+            const count = document.getElementById('live-user-count') ? document.getElementById('live-user-count').innerText : "Varios";
+            showAppNotification("Comunidad Activa 👥", `${count} usuarios activos leyendo en este momento`, null, "👥");
+        }, 10000);
+    }
+
+    setTimeout(startNotificationLoop, 5000);
+
            /* --- 4. ADMIN MODE (CONTROL TOTAL) --- */
-    window.toggleAdminMode = function() {
+       window.toggleAdminMode = function() {
         if (isAdminMode) {
             isAdminMode = false;
             toggleAdminForms(false);
@@ -1132,7 +1271,7 @@
             initSocialFeed(); 
             return;
         }
-        document.getElementById('admin-login-modal').style.display = 'flex';
+        document.getElementById('auth-login-modal').style.display = 'flex';
     };
 
     window.loginAdmin = async function() {
@@ -1146,7 +1285,8 @@
         
         try {
             await signInWithEmailAndPassword(auth, em, pw);
-            document.getElementById('admin-login-modal').style.display = 'none';
+            document.getElementById('auth-login-modal').style.display = 'none';
+
             isAdminMode = true;
             toggleAdminForms(true);
             showModal("Éxito", "✅ Modo Admin: ACTIVADO\nTienes CONTROL TOTAL.");
@@ -1168,20 +1308,29 @@
         }
     };
 
-
-            function toggleAdminForms(show) {
+        async function toggleAdminForms(show) {
         const display = show ? 'block' : 'none';
-        const verseForm = document.getElementById('admin-verse-form');
         const updForm = document.getElementById('admin-update-form');
         const btnDropboxAdmin = document.getElementById('btn-admin-dropbox');
         const apiVault = document.getElementById('admin-api-vault');
-        if(verseForm) verseForm.style.display = display;
         if(updForm) updForm.style.display = display;
         if(btnDropboxAdmin) btnDropboxAdmin.style.display = show ? 'inline-block' : 'none';
         if(apiVault) apiVault.style.display = display;
+
+        if (show) {
+            try {
+                const countSnap = await getCountFromServer(collection(db, "usuarios"));
+                const totalEl = document.getElementById('admin-total-users');
+                if (totalEl) totalEl.innerText = countSnap.data().count;
+            } catch(e) {
+                console.error("Error contando usuarios:", e);
+                const totalEl = document.getElementById('admin-total-users');
+                if (totalEl) totalEl.innerText = "Error";
+            }
+        }
     }
 
-
+            
     /* --- 5. FUNCIONES CRUD GENERALES --- */
     
        window.saveApiKeys = async function() {
@@ -1319,16 +1468,27 @@
         if(id === 'versiculo') startFallingLeaves(); else stopFallingLeaves();
     }
 
-    function startUserCounter() {
+            function startUserCounter() {
         const el = document.getElementById('live-user-count');
-        if(!el) return;
-        el.innerText = Math.floor(Math.random() * (12 - 4 + 1) + 4);
+        const adminEl = document.getElementById('admin-live-users');
         if(robotInterval) clearInterval(robotInterval);
+        
         robotInterval = setInterval(() => {
-            const count = Math.floor(Math.random() * (15 - 4 + 1) + 4);
-            el.innerText = count;
-        }, 5000); 
+            if (window.currentUser) {
+                setDoc(doc(db, "activos", window.currentUser.uid), { lastSeen: Date.now() });
+            }
+        }, 10000);
+        
+        onSnapshot(collection(db, "activos"), (snap) => {
+            let c = 0;
+            const now = Date.now();
+            snap.forEach(d => { if(now - d.data().lastSeen < 30000) c++; });
+            if(c === 0) c = 1;
+            if(el) el.innerText = c;
+            if(adminEl) adminEl.innerText = c;
+        });
     }
+
     
     function stopUserCounter() {
         if(robotInterval) clearInterval(robotInterval);
@@ -1396,12 +1556,13 @@
         if(!books.length) { c.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#777">Vacío</p>'; return; }
 
         const appendAd = () => {
-            const adDiv = document.createElement('div');
+                      const adDiv = document.createElement('div');
             adDiv.style.gridColumn = '1 / -1';
             adDiv.style.display = 'flex';
             adDiv.style.justifyContent = 'center';
-            adDiv.style.margin = '15px 0 25px 0';
-            adDiv.style.width = '100%';
+            adDiv.style.margin = '15px 10px 25px 10px';
+            adDiv.style.width = 'auto';
+            adDiv.style.overflow = 'hidden';
             
             const innerBox = document.createElement('div');
             innerBox.style.background = 'rgba(0,0,0,0.2)';
@@ -1413,7 +1574,9 @@
             innerBox.style.alignItems = 'center';
             innerBox.style.justifyContent = 'center';
             innerBox.style.overflow = 'hidden';
-            innerBox.style.minWidth = '320px';
+            innerBox.style.maxWidth = '100%';
+            innerBox.style.boxSizing = 'border-box';
+
             
             const label = document.createElement('span');
             label.style.fontSize = '9px';
@@ -1823,11 +1986,22 @@
     };
 
 
-    window.updateDailyVerse = async function() {
-        try { await setDoc(doc(db, "configuracion", "versiculo_diario"), { title:document.getElementById('verseTitle').value, text:document.getElementById('verseText').value, image:document.getElementById('verseImgUrl').value, date: new Date().toLocaleDateString() }); showModal("Listo", "Versículo actualizado."); } catch(e){alert(e.message);}
+        window.updateDailyVerse = async function() {
+        const t = document.getElementById('verseTitle').value;
+        const text = document.getElementById('verseText').value;
+        const img = document.getElementById('verseImgUrl').value;
+        if(!t || !text) return alert("Falta título o texto");
+        try { 
+            await addDoc(collection(db, "versiculos"), { title: t, text: text, image: img, date: new Date().toLocaleDateString(), timestamp: serverTimestamp() }); 
+            showModal("Listo", "Versículo publicado."); 
+            document.getElementById('verseTitle').value = '';
+            document.getElementById('verseText').value = '';
+            document.getElementById('verseImgUrl').value = '';
+        } catch(e){alert(e.message);}
     };
-    window.deleteDailyVerse = async function() { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "configuracion", "versiculo_diario")); };
+    window.deleteDailyVerse = async function(id) { if(confirm("¿Borrar este versículo?")) await deleteDoc(doc(db, "versiculos", id)); };
         window.scanAndRemoveDuplicates = async function() {
+
         if(!confirm("🕵️ ADMIN: ¿Quieres escanear y eliminar los libros repetidos en la base de datos (dejando solo uno de cada título)? Esta acción no se puede deshacer.")) return;
         
         const titlesSeen = {};
@@ -1858,11 +2032,7 @@
         }
     };
 
-    function renderVerse(d) {
-        if(!d) { document.getElementById('displayVerseTitle').innerText=""; document.getElementById('displayVerseText').innerText="Esperando..."; document.getElementById('displayVerseImg').style.display='none'; return; }
-        document.getElementById('displayVerseTitle').innerText=d.title; document.getElementById('displayVerseText').innerText=`"${d.text}"`; document.getElementById('verseDate').innerText=d.date;
-        const img=document.getElementById('displayVerseImg'); if(d.image){img.src=d.image; img.style.display='block';}else{img.style.display='none';}
-    }
+   
     
     function startFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); const c=document.getElementById('versiculo-container'); leavesInterval=setInterval(()=>{if(c.querySelectorAll('.leaf').length>15)return; const l=document.createElement('div');l.className='leaf';l.style.left=Math.random()*90+"%";l.style.animationDuration=(Math.random()*3+4)+"s";l.onanimationend=()=>l.remove();c.appendChild(l);},800); }
     function stopFallingLeaves() { if(leavesInterval) clearInterval(leavesInterval); document.querySelectorAll('.leaf').forEach(e=>e.remove()); }
@@ -1894,11 +2064,23 @@
         onAuthStateChanged(auth, async (user) => {
         window.currentUser = user; 
         
-        if (user) {
-            if (user.isAnonymous) {
+                if (user) {
+            if (user.email === 'admin@biblioteca.com' || user.email === 'mancillacanales992@gmail.com') {
+                isAdminMode = true;
+                toggleAdminForms(true);
                 updateUserUI();
+                initSocialFeed();
+                return;
+            }
+                        if (user.isAnonymous) {
+                updateUserUI();
+                if (!localStorage.getItem('guest_skipped')) {
+                    document.getElementById('welcome-modal').style.display = 'flex';
+                }
             } else {
+
                 const userRef = doc(db, "usuarios", user.uid);
+
                 const userSnap = await getDoc(userRef);
 
                 if (userSnap.exists()) {
@@ -1921,31 +2103,65 @@
         initSocialFeed();
     });
 
+       window.handleProfileClick = function() {
+        toggleDrawer();
+        if (isAdminMode) {
+            document.getElementById('admin-panel-modal').style.display = 'flex';
+        } else if (window.currentUser && window.currentUserProfile) {
+                     document.getElementById('profile-nick').value = window.currentUserProfile.nickname;
+            document.getElementById('profile-setup-modal').style.display = 'flex';
+        } else {
+            document.getElementById('auth-login-modal').style.display = 'flex';
+        }
+    };
 
     function updateUserUI() {
         const loginPrompt = document.getElementById('feed-login-prompt');
         const createPostCard = document.getElementById('create-post-container');
+        
+        const drawerUser = document.getElementById('drawer-username');
+        const drawerAvatar = document.getElementById('drawer-avatar');
+        const drawerDesc = document.getElementById('drawer-user-desc');
 
         const canPost = isAdminMode || (window.currentUser && window.currentUserProfile);
+
+        if (isAdminMode && !window.currentUserProfile) {
+            if(drawerUser) drawerUser.innerText = "ADMINISTRADOR";
+            if(drawerAvatar) drawerAvatar.innerText = "🛡️";
+            if(drawerDesc) drawerDesc.innerText = "Panel de Control";
+            document.getElementById('user-name-display').innerText = "ADMINISTRADOR";
+            document.getElementById('user-avatar-display').innerText = "🛡️";
+        } else if (window.currentUserProfile) {
+            if(drawerUser) drawerUser.innerText = window.currentUserProfile.nickname;
+            if(drawerAvatar) drawerAvatar.innerText = window.currentUserProfile.avatar;
+            if(drawerDesc) drawerDesc.innerText = "Editar Perfil";
+            document.getElementById('user-name-display').innerText = window.currentUserProfile.nickname;
+            document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
+        } else {
+            if(drawerUser) drawerUser.innerText = "Iniciar Sesión";
+            if(drawerAvatar) drawerAvatar.innerText = "👤";
+            if(drawerDesc) drawerDesc.innerText = "Toca para conectarte";
+        }
 
         if (canPost) {
             loginPrompt.style.display = 'none';
             createPostCard.style.display = 'block';
-
-            if (isAdminMode && !window.currentUserProfile) {
-                document.getElementById('user-name-display').innerText = "ADMINISTRADOR";
-                document.getElementById('user-avatar-display').innerText = "🛡️";
-            } else if (window.currentUserProfile) {
-                document.getElementById('user-name-display').innerText = window.currentUserProfile.nickname;
-                document.getElementById('user-avatar-display').innerText = window.currentUserProfile.avatar;
-            }
         } else {
             loginPrompt.style.display = 'block';
             createPostCard.style.display = 'none';
         }
+                const verseForm = document.getElementById('admin-verse-form');
+        if (verseForm) {
+            verseForm.style.display = canPost ? 'block' : 'none';
+            verseForm.querySelector('h4').innerText = isAdminMode ? "Admin: Versículo Diario" : "Compartir Versículo Diario";
+            const delVerseBtn = verseForm.querySelector('button[onclick="deleteDailyVerse()"]');
+            if (delVerseBtn) delVerseBtn.style.display = isAdminMode ? 'inline-block' : 'none';
+        }
+
         
         updateVideoUploadUI();
     }
+
 
     window.selectAvatar = (emoji, el) => {
         document.querySelectorAll('.avatar-option').forEach(d => d.classList.remove('selected'));
@@ -2105,12 +2321,14 @@
                                 ${adminControls}
                             </span>
                             <span class="post-date">${post.dateStr || ''}</span>
-                        </div>
-                    </div>
-                    <div class="post-title">${post.title || ''}</div>
-                    <div class="post-body">${post.text || ''}</div>
-                    
-                    <div class="social-actions">
+                                         </div>
+                </div>
+                <div class="post-title">${post.title || ''}</div>
+                <div class="post-body">${post.text || ''}</div>
+                ${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:15px; border:1px solid var(--ui-border); object-fit:cover; max-height:400px;">` : ''}
+                
+                <div class="social-actions">
+
                         <button class="action-btn ${userLiked ? 'liked' : ''}" onclick="interactPost('${pid}', 'like')">
                             👍 ${likes.length || 0}
                         </button>
@@ -2139,12 +2357,14 @@
 
     /* --- D. ACCIONES SOCIALES --- */
     
-    window.createPost = async () => {
+       window.createPost = async () => {
         let title = document.getElementById('postTitle').value.trim();
         let text = document.getElementById('postBody').value.trim();
+        let imgUrl = document.getElementById('postImgUrl') ? document.getElementById('postImgUrl').value.trim() : '';
         if(!title || !text) return alert("Escribe algo.");
 
         let pName, pAvatar, pUid;
+
 
         if (isAdminMode) {
             pName = "ADMINISTRADOR";
@@ -2159,9 +2379,9 @@
             pUid = window.currentUser.uid;
         }
 
-        try {
+               try {
             await addDoc(collection(db, "publicaciones"), {
-                title: title, text: text,
+                title: title, text: text, imageUrl: imgUrl,
                 authorName: pName,
                 authorAvatar: pAvatar,
                 authorUid: pUid,
@@ -2171,7 +2391,9 @@
             });
             document.getElementById('postTitle').value = '';
             document.getElementById('postBody').value = '';
+            if(document.getElementById('postImgUrl')) document.getElementById('postImgUrl').value = '';
             showModal("Publicado", "Tu tema está en el muro.");
+
         } catch(e) { alert("Error: " + e.message); }
     };
 
@@ -2349,9 +2571,8 @@
             document.getElementById('fileStatus').innerText = "✅ Seleccionado de Drive: " + doc.name;
         }
     }
-    window.importFromDrive = async function() {
+        window.importFromDrive = async function() {
         if (!globalDriveClientId || !globalDriveApiKey) return alert("Faltan credenciales de Drive en la Bóveda.");
-        
         const folderId = prompt("Ingresa el ID de la carpeta de Google Drive:");
         if (!folderId) return;
 
@@ -2366,49 +2587,74 @@
                 const token = response.access_token;
                 
                 try {
-                                        const res = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&pageSize=1000&fields=files(name,webViewLink)&key=${globalDriveApiKey}`, {
+                    document.getElementById('massive-progress-container').style.display = 'block';
+                    document.getElementById('massive-progress-text').innerText = "Verificando catálogo existente para omitir duplicados...";
+                    
+                    const snapLibros = await getDocs(collection(db, "libros"));
+                    const titulosExistentes = new Set();
+                    snapLibros.forEach(doc => titulosExistentes.add(doc.data().title.toLowerCase().trim()));
 
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    });
+                    let todosLosArchivos = [];
+                    let pageToken = "";
                     
-                    if (!res.ok) throw new Error("Error al listar archivos. Verifica el ID de la carpeta o los permisos.");
-                    const data = await res.json();
-                    
-                    if (!data.files || data.files.length === 0) {
-                        return alert("No se encontraron archivos en esta carpeta.");
+                    do {
+                        document.getElementById('massive-progress-text').innerText = `Buscando en Drive... (${todosLosArchivos.length} archivos leídos)`;
+                        let url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&pageSize=1000&fields=nextPageToken,files(name,webViewLink)&key=${globalDriveApiKey}`;
+                        if (pageToken) url += `&pageToken=${pageToken}`;
+                        
+                        const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+                        if (!res.ok) throw new Error("Error al listar archivos. Verifica el ID de la carpeta o los permisos.");
+                        const data = await res.json();
+                        
+                        if (data.files) {
+                            const validFiles = data.files.filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.epub'));
+                            todosLosArchivos = todosLosArchivos.concat(validFiles);
+                        }
+                        pageToken = data.nextPageToken;
+                    } while (pageToken);
+
+                    const total = todosLosArchivos.length;
+                    if(total === 0) {
+                        document.getElementById('massive-progress-container').style.display = 'none';
+                        return alert("No se encontraron archivos PDF o ePub válidos.");
                     }
 
-                                        const validFiles = data.files.filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.epub'));
-                    const total = validFiles.length;
-                    if(total === 0) return alert("No se encontraron archivos PDF o ePub válidos.");
-
-                    const progressContainer = document.getElementById('massive-progress-container');
                     const progressBar = document.getElementById('massive-progress-bar');
                     const progressText = document.getElementById('massive-progress-text');
-                    progressContainer.style.display = 'block';
-
+                    
                     let procesados = 0;
+                    let omitidos = 0;
+
                     for (let i = 0; i < total; i++) {
-                        const file = validFiles[i];
-                        progressText.innerText = `Importando ${i + 1} de ${total}...`;
+                        const file = todosLosArchivos[i];
+                        progressText.innerText = `Importando ${i + 1} de ${total}... (Omitidos: ${omitidos})`;
                         progressBar.style.width = `${((i + 1) / total) * 100}%`;
 
                         const title = file.name.replace('.pdf', '').replace('.epub', '').replace(/_/g, ' ');
-                        await addDoc(collection(db, "libros"), {
-                            title: title, author: "Drive Import", pdfLink: file.webViewLink, cover: "", timestamp: serverTimestamp()
-                        });
-                        procesados++;
-                    }
-                    progressContainer.style.display = 'none';
-                    alert(`📥 Importación masiva de Drive completada. Se añadieron ${procesados} libros.`);
+                        const cleanTitle = title.toLowerCase().trim();
 
+                        if (!titulosExistentes.has(cleanTitle)) {
+                            await addDoc(collection(db, "libros"), {
+                                title: title, author: "Drive Import", pdfLink: file.webViewLink, cover: "", timestamp: serverTimestamp()
+                            });
+                            titulosExistentes.add(cleanTitle);
+                            procesados++;
+                        } else {
+                            omitidos++;
+                        }
+                    }
+                    document.getElementById('massive-progress-container').style.display = 'none';
+                    alert(`📥 Importación masiva completada.\n✅ Añadidos nuevos: ${procesados}\n⏭️ Omitidos (Repetidos): ${omitidos}`);
+                    loadInitialBooks(); 
                 } catch (err) {
+                    document.getElementById('massive-progress-container').style.display = 'none';
                     alert("Error en importación de Drive: " + err.message);
                 }
             }
         });
         tokenClient.requestAccessToken();
     };
+
 
     /* --- H. INICIO --- */
     navigate('recientes');
@@ -2421,6 +2667,32 @@
 <script async defer src="https://apis.google.com/js/api.js"></script>
 
 <script async defer src="https://accounts.google.com/gsi/client"></script>
+<div id="app-notification" style="display:none; position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:rgba(20,20,25,0.98); border:1px solid var(--accent); border-radius:15px; padding:15px 20px; z-index:10000; box-shadow:0 10px 30px rgba(0,0,0,0.8); transition:top 0.5s ease; width:80%; max-width:350px; cursor:pointer;" onclick="closeAppNotification()">
+    <div style="display:flex; align-items:center; gap:15px;">
+                <div id="notif-icon" style="width:40px; height:60px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:24px; background:rgba(255,255,255,0.05); overflow:hidden; flex-shrink:0;">🔔</div>
+
+        <div style="flex:1;">
+            <h4 id="notif-title" style="margin:0; color:var(--accent); font-size:14px;">Notificación</h4>
+            <p id="notif-desc" style="margin:5px 0 0 0; color:var(--text-main); font-size:12px;"></p>
+        </div>
+    </div>
+</div>
+    <div id="welcome-modal" class="modal-overlay" style="z-index:10005;">
+    <div class="modal-content">
+        <h2 style="color:var(--accent); margin-top:0;">Bienvenido a<br>Mi Biblioteca Cristiana</h2>
+        <p style="color:var(--text-main); font-size:14px; margin-bottom:10px;">Descubre más sobre Dios a través de la lectura.</p>
+        <p style="color:var(--text-muted); font-size:12px; margin-bottom:20px;">Regístrate para poder acceder, participar en la comunidad y publicar videos y versículos.</p>
+        
+        <button class="btn-google" onclick="document.getElementById('welcome-modal').style.display='none'; loginWithGoogle()" style="margin:0 auto 15px auto; width:100%;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+            Registrarse / Iniciar Sesión
+        </button>
+        
+        <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="localStorage.setItem('guest_skipped', 'true'); document.getElementById('welcome-modal').style.display='none';">Más tarde (Continuar como invitado)</button>
+    </div>
+</div>
+
+
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
