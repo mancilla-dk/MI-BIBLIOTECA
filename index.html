@@ -459,22 +459,34 @@
         <div style="font-size:40px; margin-bottom:10px">👋</div>
         <h3 style="color:var(--accent); margin:0 0 5px 0;">¡Bienvenido/a!</h3>
 
-        <p style="color:var(--text-main); font-size:13px; margin-bottom:20px;">Configura tu perfil para la comunidad.</p>
+                <p style="color:var(--text-main); font-size:13px; margin-bottom:20px;">Configura tu perfil para la comunidad.</p>
         
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">TU CORREO (Google)</label>
+        <input type="text" id="profile-email-display" class="input-box" style="margin-top:0; padding:10px; font-size:12px; background:rgba(255,255,255,0.05); color:#888;" disabled readonly>
+        <p style="font-size:9px; color:#777; text-align:left; margin-top:-15px; margin-bottom:15px;">*Tu contraseña es administrada de forma segura por Google.</p>
+
         <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">TU APODO / NICKNAME</label>
-        <input type="text" id="profile-nick" class="input-box" style="margin-top:0; text-align:center;" placeholder="Ej: Juan_316">
+        <input type="text" id="profile-nick" class="input-box" style="margin-top:0; padding:10px; text-align:center;" placeholder="Ej: Juan_316">
+
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">FECHA DE NACIMIENTO</label>
+        <input type="date" id="profile-birthdate" class="input-box" style="margin-top:0; padding:10px; margin-bottom:15px;">
         
-        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:10px;">ELIGE TU AVATAR</label>
-        <div class="avatar-grid">
-            <div class="avatar-option" onclick="selectAvatar('👨', this)">👨</div>
-            <div class="avatar-option" onclick="selectAvatar('👩', this)">👩</div>
-            <div class="avatar-option" onclick="selectAvatar('👦', this)">👦</div>
-            <div class="avatar-option" onclick="selectAvatar('👧', this)">👧</div>
-            <div class="avatar-option" onclick="selectAvatar('👤', this)">👤</div>
+        <label style="font-size:11px; font-weight:bold; color:var(--text-muted); display:block; text-align:left; margin-bottom:5px;">ELIGE TU AVATAR O SUBE UNA FOTO</label>
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <button type="button" class="btn-neon" style="font-size:10px; padding:8px; background:rgba(0, 229, 255, 0.1);" onclick="openCloudinaryWidgetForCover('custom-avatar-url')">🖼️ SUBIR MI FOTO</button>
+            <input type="text" id="custom-avatar-url" class="input-box" placeholder="URL de tu foto" style="margin:0; padding:8px; font-size:10px;" readonly>
+        </div>
+        <div class="avatar-grid" style="margin-top:0;">
+            <div class="avatar-option" onclick="selectAvatar('👨', this); document.getElementById('custom-avatar-url').value='';">👨</div>
+            <div class="avatar-option" onclick="selectAvatar('👩', this); document.getElementById('custom-avatar-url').value='';">👩</div>
+            <div class="avatar-option" onclick="selectAvatar('👦', this); document.getElementById('custom-avatar-url').value='';">👦</div>
+            <div class="avatar-option" onclick="selectAvatar('👧', this); document.getElementById('custom-avatar-url').value='';">👧</div>
+            <div class="avatar-option" onclick="selectAvatar('👤', this); document.getElementById('custom-avatar-url').value='';">👤</div>
         </div>
         <input type="hidden" id="selected-avatar-val">
 
         <div class="terms-container">
+
             <input type="checkbox" id="terms-check" onchange="toggleSaveBtn()">
             <span>Acepto los <span class="terms-link" onclick="showTerms()">Términos y Condiciones</span> de la comunidad.</span>
         </div>
@@ -558,10 +570,16 @@
             <button class="btn-neon" onclick="importFromDrive()" style="background:rgba(0,230,118,0.2); border-color:#00e676; color:#00e676;">📥 IMPORTACIÓN DRIVE</button>
             <button class="btn-neon" onclick="toggleMultiSelectMode()" style="background:rgba(255,234,0,0.2); border-color:#ffea00; color:#ffea00; margin-top:10px;">☑️ MODO SELECCIÓN</button>
             <button id="btn-delete-selected" class="btn-neon" onclick="deleteSelectedBooks()" style="display:none; background:rgba(255,23,68,0.2); border-color:#ff1744; color:#ff1744; margin-top:10px;">🗑️ ELIMINAR SELECCIONADOS</button>
-            <button class="btn-neon" onclick="scanAndRemoveDuplicates()" style="background:rgba(213,0,249,0.2); border-color:#d500f9; color:#d500f9; margin-top:10px;">🕵️ ESCANEAR DUPLICADOS</button>
+                      <button class="btn-neon" onclick="scanAndRemoveDuplicates()" style="background:rgba(213,0,249,0.2); border-color:#d500f9; color:#d500f9; margin-top:10px;">🕵️ ESCANEAR DUPLICADOS</button>
         </div>
 
         <button id="btn-admin-dropbox" onclick="importFromDropbox()" style="display:none; background:rgba(0,100,255,0.2); border:1px solid #0064ff; padding:5px 15px; border-radius:15px; color:#0064ff; font-size:10px; cursor:pointer; margin-top:10px; width:100%;">📥 IMPORTACIÓN DROPBOX</button>
+
+        <button class="btn-neon" onclick="toggleAdminUsersList()" style="background:rgba(255,140,0,0.2); border-color:#ff8c00; color:#ff8c00; margin-top:10px; width:100%;">👥 GESTIONAR USUARIOS (BAN)</button>
+        <div id="admin-users-section" style="display:none; margin-top:10px; border:1px solid #ff8c00; border-radius:8px; padding:10px; max-height:200px; overflow-y:auto; text-align:left;">
+            <p style="font-size:11px; color:var(--text-muted); margin-top:0;">Lista de usuarios registrados:</p>
+            <div id="admin-users-list-content">Cargando...</div>
+        </div>
 
         <div id="admin-update-form" style="display:none; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
             <h3 style="color:var(--accent); text-align:center; margin-bottom:5px;">🔔 Configurar Alerta</h3>
@@ -741,10 +759,12 @@
                 <div style="font-size:50px; margin-bottom:10px">👥</div>
                 <h3 style="color:var(--accent); margin-top:0">Únete a la Comunidad</h3>
                 <p style="color:var(--text-muted); font-size:13px;">Inicia sesión para publicar temas, dar likes y comentar.</p>
+                        
                 <button class="btn-google" onclick="loginWithGoogle()" style="margin:20px auto; width:80%;">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
                     Iniciar Sesión con Google
                 </button>
+
             </div>
 
             <div id="create-post-container" class="create-post-card" style="display:none;">
@@ -990,7 +1010,7 @@
 <script type="module">
         /* --- 1. CONFIGURACIÓN DE FIREBASE --- */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-               import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+                              import { getAuth, signInWithRedirect, getRedirectResult, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         import { getFirestore, collection, addDoc, deleteDoc, updateDoc, setDoc, getDoc, doc, onSnapshot, query, orderBy, serverTimestamp, where, limit, arrayUnion, arrayRemove, increment, getDocs, startAfter, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -1353,13 +1373,51 @@
         };
         try { await setDoc(doc(db, "configuracion", "alerta_update"), data); showModal("Guardado", "Alerta actualizada."); } catch(e) { alert(e.message); }
     };
-
     window.deleteItem = async function(collectionName, id) {
         if(event) event.stopPropagation();
         if(!confirm("⚠️ ADMIN: ¿ELIMINAR ESTE ELEMENTO?")) return;
         try { await deleteDoc(doc(db, collectionName, id)); } catch (e) { alert("Error: " + e.message); }
     };
+
+    window.toggleAdminUsersList = async function() {
+        const sec = document.getElementById('admin-users-section');
+        if(sec.style.display === 'block') { sec.style.display = 'none'; return; }
+        sec.style.display = 'block';
+        const listEl = document.getElementById('admin-users-list-content');
+        listEl.innerHTML = '<span style="color:var(--text-muted); font-size:11px;">Cargando usuarios...</span>';
+        try {
+            const snap = await getDocs(collection(db, "usuarios"));
+            listEl.innerHTML = '';
+            if(snap.empty) { listEl.innerHTML = '<span style="color:#aaa; font-size:10px;">No hay usuarios.</span>'; return; }
+            snap.forEach(docSnap => {
+                const u = docSnap.data();
+                const isBanned = u.status === 'bloqueado';
+                const btnText = isBanned ? '🟢 DESBANEAR' : '🚫 BANEAR';
+                const btnColor = isBanned ? '#00e676' : '#ff1744';
+                listEl.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size:11px;">
+                        <span style="color:var(--accent); font-weight:bold;">${u.nickname}</span><br>
+                        <span style="color:#888; font-size:9px;">${u.email || 'Sin correo'}</span>
+                    </div>
+                    <button onclick="toggleBanStatus('${u.uid}', '${u.status}')" style="background:rgba(0,0,0,0.5); border:1px solid ${btnColor}; color:${btnColor}; font-size:9px; padding:3px 6px; border-radius:4px; cursor:pointer;">${btnText}</button>
+                </div>`;
+            });
+        } catch(e) { listEl.innerHTML = '<span style="color:red; font-size:11px;">Error al cargar.</span>'; }
+    };
+
+    window.toggleBanStatus = async function(uid, currentStatus) {
+        const newStatus = currentStatus === 'bloqueado' ? 'activo' : 'bloqueado';
+        if(!confirm(`¿Cambiar estado del usuario a: ${newStatus.toUpperCase()}?`)) return;
+        try {
+            await updateDoc(doc(db, "usuarios", uid), { status: newStatus });
+            alert(`✅ Usuario actualizado a ${newStatus}`);
+            document.getElementById('admin-users-section').style.display = 'none';
+            toggleAdminUsersList(); 
+        } catch(e) { alert("Error: " + e.message); }
+    };
+
     window.toggleMultiSelectMode = function() {
+
         isMultiSelectMode = !isMultiSelectMode;
         selectedBooksIds = [];
         document.getElementById('btn-delete-selected').style.display = isMultiSelectMode ? 'inline-block' : 'none';
@@ -2050,12 +2108,14 @@
         try { 
             const provider = new GoogleAuthProvider(); 
             provider.setCustomParameters({ prompt: 'select_account' });
-            await signInWithRedirect(auth, provider); 
+            await signInWithPopup(auth, provider); 
         } catch(e) { 
-            alert("Error login: " + e.message); 
+            if (e.code !== 'auth/popup-closed-by-user') {
+                alert("Error login: " + e.message); 
+            }
         }
     };
-
+           
     window.logout = () => {
         signOut(auth);
         window.location.reload(); 
@@ -2074,10 +2134,11 @@
             }
                         if (user.isAnonymous) {
                 updateUserUI();
-                if (!localStorage.getItem('guest_skipped')) {
+                if (!sessionStorage.getItem('guest_skipped')) {
                     document.getElementById('welcome-modal').style.display = 'flex';
                 }
             } else {
+                        
 
                 const userRef = doc(db, "usuarios", user.uid);
 
@@ -2089,19 +2150,27 @@
                         alert("🚫 TU CUENTA HA SIDO BLOQUEADA POR EL ADMINISTRADOR.");
                     }
                     updateUserUI();
-                } else {
-                    document.getElementById('profile-nick').value = user.displayName; 
+                                             } else {
+                    document.getElementById('profile-nick').value = user.displayName || ''; 
+                    const emailField = document.getElementById('profile-email-display');
+                    if(emailField) emailField.value = user.email || 'Sin correo público';
                     document.getElementById('profile-setup-modal').style.display = 'flex';
                 }
+
             }
-        } else {
-            signInAnonymously(auth).catch((error) => console.error("Error Auth Anónima:", error));
+                       } else {
+            signInAnonymously(auth).catch((error) => console.error("Error Auth:", error));
             updateUserUI();
+            if (!sessionStorage.getItem('guest_skipped')) {
+                document.getElementById('welcome-modal').style.display = 'flex';
+            }
         }
 
         updateVideoUploadUI();
         initSocialFeed();
     });
+
+
 
        window.handleProfileClick = function() {
         toggleDrawer();
@@ -2180,18 +2249,26 @@
         document.getElementById('terms-modal').style.display = 'flex';
     };
 
-    window.saveUserProfile = async () => {
+       window.saveUserProfile = async () => {
         const nick = document.getElementById('profile-nick').value.trim();
-        const avatar = document.getElementById('selected-avatar-val').value;
+        let avatar = document.getElementById('selected-avatar-val').value;
+        const customAvatar = document.getElementById('custom-avatar-url').value;
+        const birthdate = document.getElementById('profile-birthdate').value;
         const terms = document.getElementById('terms-check').checked;
 
-        if(!nick || !avatar) return alert("Por favor elige un Nickname y un Avatar.");
+        if(customAvatar !== '') {
+            avatar = `<img src="${customAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        }
+
+        if(!nick || (!avatar && customAvatar === '')) return alert("Por favor elige un Nickname y un Avatar (o sube una foto).");
+        if(!birthdate) return alert("Por favor ingresa tu fecha de nacimiento.");
         if(!terms) return alert("Debes aceptar los Términos y Condiciones.");
 
         const userData = {
             uid: window.currentUser.uid,
             nickname: nick,
             avatar: avatar,
+            birthdate: birthdate,
             email: window.currentUser.email,
             status: 'activo', 
             createdAt: serverTimestamp()
@@ -2686,9 +2763,9 @@
         <button class="btn-google" onclick="document.getElementById('welcome-modal').style.display='none'; loginWithGoogle()" style="margin:0 auto 15px auto; width:100%;">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
             Registrarse / Iniciar Sesión
-        </button>
-        
-        <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="localStorage.setItem('guest_skipped', 'true'); document.getElementById('welcome-modal').style.display='none';">Más tarde (Continuar como invitado)</button>
+        </button>        
+        <button class="btn-neon" style="border-color:#555; color:#aaa; font-size:11px; padding:8px;" onclick="sessionStorage.setItem('guest_skipped', 'true'); document.getElementById('welcome-modal').style.display='none';">Más tarde (Continuar como invitado)</button>
+       
     </div>
 </div>
 
@@ -2702,6 +2779,4 @@
 </script>
 
 </body>
-</html>
-
-
+    </html>
